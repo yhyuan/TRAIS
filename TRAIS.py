@@ -83,7 +83,6 @@ class Substance:
 	def __init__(self, row):
 		self.row = row
 	def parse(self, item):
-		#print type(item)
 		if (type(item) is unicode or type(item) is str) and len(item) == 0:
 			return 0
 		elif type(item) is unicode or type(item) is str :
@@ -106,7 +105,6 @@ class Substance:
 		disposalOnSite = self.parse(self.row[46]) + self.parse(self.row[47]) + self.parse(self.row[48])   # AU, AV, AW
 		result = result + "\n\t\t\t\tDOnSite: " + str(disposalOnSite) + ","
 		disposalOffSite = self.parse(self.row[49]) + self.parse(self.row[50]) + self.parse(self.row[51]) + self.parse(self.row[52]) + self.parse(self.row[53]) + self.parse(self.row[54]) + self.parse(self.row[55])  + self.parse(self.row[56]) + self.parse(self.row[57])   # AX, AY, AZ, BA, BB, BC, BD, BE, BF
-		#print disposalOffSite
 		result = result + "\n\t\t\t\tDOffSite: " + str(disposalOffSite) + ","
 		recycleOffSite = self.parse(self.row[62]) + self.parse(self.row[63]) + self.parse(self.row[64]) + self.parse(self.row[65]) + self.parse( self.row[66]) + self.parse(self.row[67]) + self.parse(self.row[68] ) + self.parse(self.row[69]) + self.parse(self.row[70]) + self.parse(self.row[71])   # BK, BL, BM, BN, BO, BP, BQ, BR, BS, BT
 		result = result + "\n\t\t\t\tROffSite: " + str(recycleOffSite)
@@ -139,6 +137,7 @@ class Facility:
 		result = result[:-1] + "]\n\t\t};";
 		return result
 
+#Create NAICS Dictionary
 NAICSDictionary = {}
 import fileinput
 for line in fileinput.input('NAICS.txt'):
@@ -146,7 +145,8 @@ for line in fileinput.input('NAICS.txt'):
 	code = (items[0])
 	name = (items[1])[1:-1]
 	NAICSDictionary[code] = name
-	
+
+#Read Excel File	
 import xlrd
 wb = xlrd.open_workbook('201305_TRAIScurrent.xls')
 sh = wb.sheet_by_name(u'Public Data')
@@ -161,6 +161,8 @@ for rownum in range(1, sh.nrows):
 	else:
 		facility = dataset[NPRIID]
 		facility.substances.append(Substance(row))
+
+#Generate Reports
 for key, value in dataset.iteritems():
 	if type(key) is unicode and len(key) == 0:
 		continue
