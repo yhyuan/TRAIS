@@ -9,8 +9,7 @@ MOE REG127 Number	5
 NAICS	6
 Number of Employees	7
 Street Address (Physical Address)	8
-"Municipality/
-City (Physical Address)"	9
+"Municipality/City (Physical Address)"	9
 Province (Physical Address)	10
 PostalZip (Physical Address)	11
 Country (Physical Address)	12
@@ -76,11 +75,78 @@ Other (Recycling)	71
 Highest Ranking Employee	72
 Other Sources (VOC) (Releases to Air)	73
 '''
+import sys
+reload(sys)
+sys.setdefaultencoding("latin-1")
 
+class Substance:
+	def __init__(self, row):
+		self.row = row
+	def parse(self, item):
+		#print type(item)
+		if (type(item) is unicode or type(item) is str) and len(item) == 0:
+			return 0
+		elif type(item) is unicode or type(item) is str :
+			return float(item)
+		else:
+			return item
+	def __str__(self):
+		result = "{\n"
+		result = result + "\t\t\t\tName: \"" + self.row[28] + "\","
+		result = result + "\n\t\t\t\tUnits: \"" + self.row[30] + "\","
+		result = result + "\n\t\t\t\tUsed: \"" + str(self.row[31]) + "\","
+		result = result + "\n\t\t\t\tCreated: \"" + str(self.row[32]) + "\","
+		result = result + "\n\t\t\t\tContained: \"" + str(self.row[33]) + "\","
+		air = self.parse(self.row[35]) + self.parse(self.row[36]) + self.parse(self.row[37]) + self.parse(self.row[38])  + self.parse(self.row[39]) + self.parse(self.row[73])  #AJ, AK, AL, AM, AN, BV
+		result = result + "\n\t\t\t\tAir: " + str(air) + ","
+		water = self.parse(self.row[40]) + self.parse(self.row[41]) + self.parse(self.row[42])  # AO, AP, AQ
+		result = result + "\n\t\t\t\tWater: " + str(water) + ","
+		land = self.parse(self.row[43]) + self.parse(self.row[44]) + self.parse(self.row[45])   # AR, AS, AT
+		result = result + "\n\t\t\t\tLand: " + str(land) + ","
+		disposalOnSite = self.parse(self.row[46]) + self.parse(self.row[47]) + self.parse(self.row[48])   # AU, AV, AW
+		result = result + "\n\t\t\t\tDOnSite: " + str(disposalOnSite) + ","
+		disposalOffSite = self.parse(self.row[49]) + self.parse(self.row[50]) + self.parse(self.row[51]) + self.parse(self.row[52]) + self.parse(self.row[53]) + self.parse(self.row[54]) + self.parse(self.row[55])  + self.parse(self.row[56]) + self.parse(self.row[57])   # AX, AY, AZ, BA, BB, BC, BD, BE, BF
+		#print disposalOffSite
+		result = result + "\n\t\t\t\tDOffSite: " + str(disposalOffSite) + ","
+		recycleOffSite = self.parse(self.row[62]) + self.parse(self.row[63]) + self.parse(self.row[64]) + self.parse(self.row[65]) + self.parse( self.row[66]) + self.parse(self.row[67]) + self.parse(self.row[68] ) + self.parse(self.row[69]) + self.parse(self.row[70]) + self.parse(self.row[71])   # BK, BL, BM, BN, BO, BP, BQ, BR, BS, BT
+		result = result + "\n\t\t\t\tROffSite: " + str(recycleOffSite)
+		result = result + "\n\t\t\t}"
+		return result
 class Facility:
 	def __init__(self, row):
 		self.row = row
-		self.toxic = {row[28] : row[28:]}
+		self.substances = [Substance(row)]
+	def __str__(self):
+		result = "var info = {\n"
+		result = result + "\t\t\tFacilityName: \"" + self.row[3] + "\","
+		result = result + "\n\t\t\tCompanyName: \"" + self.row[1] + "\","
+		result = result + "\n\t\t\tAddress: \"" + self.row[8] + " / " + self.row[9] + "\","
+		result = result + "\n\t\t\tSector: \"" + str(int(self.row[6])) + " - " + NAICSDictionary[str(int(self.row[6]))] + "\","
+		result = result + "\n\t\t\tNPRIID: \"" + str(int(self.row[0])) + "\","
+		result = result + "\n\t\t\tPublicContact: \"" + (self.row[19]) + "\","
+		if len(str(self.row[20])) == 0:
+			phone = ""
+		elif type(self.row[20]) is float:
+			phone = str(int(self.row[20]))
+		else:
+			phone = self.row[20]
+		result = result + "\n\t\t\tPublicContactPhone: \"" + phone + "\","
+		result = result + "\n\t\t\tPublicContactEmail: \"" + self.row[23] + "\","
+		result = result + "\n\t\t\tHighestRankingEmployee: \"" + self.row[72] + "\","
+		result = result + "\n\t\t\tSubstances: ["
+		for substance in self.substances:
+			result = result + str(substance) + ","
+		result = result[:-1] + "]\n\t\t};";
+		return result
+
+NAICSDictionary = {}
+import fileinput
+for line in fileinput.input('NAICS.txt'):
+	items = line.strip().split("\t")
+	code = (items[0])
+	name = (items[1])[1:-1]
+	NAICSDictionary[code] = name
+	
 import xlrd
 wb = xlrd.open_workbook('201305_TRAIScurrent.xls')
 sh = wb.sheet_by_name(u'Public Data')
@@ -94,9 +160,17 @@ for rownum in range(1, sh.nrows):
 		dataset[NPRIID] = facility
 	else:
 		facility = dataset[NPRIID]
-		facility.toxic[row[28]] = row[28:]
+		facility.substances.append(Substance(row))
 for key, value in dataset.iteritems():
 	if type(key) is unicode and len(key) == 0:
 		continue
 	NPRIID = int(key)
-	print str(type(NPRIID)) + ", " + str(NPRIID)
+	#print str(NPRIID)	
+	#print str(value)
+	text_file = open("template_en.html", "r")
+	template = text_file.read()
+	text_file.close()
+	template = template.replace("${TRAIS_DATA}", str(value))
+	handle1 = open("json/annual" + str(NPRIID) + ".html",'w+')
+	handle1.write(template)
+	handle1.close();
