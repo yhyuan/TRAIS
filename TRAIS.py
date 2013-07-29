@@ -165,12 +165,14 @@ for key, value in dataset.iteritems():
 	if type(key) is unicode and len(key) == 0:
 		continue
 	NPRIID = int(key)
-	#print str(NPRIID)	
-	#print str(value)
-	text_file = open("template_en.html", "r")
-	template = text_file.read()
-	text_file.close()
-	template = template.replace("${TRAIS_DATA}", str(value))
-	handle1 = open("json/annual" + str(NPRIID) + ".html",'w+')
-	handle1.write(template)
-	handle1.close();
+	data = str(value)
+	languages = ["EN", "FR"]
+	for lang in languages:
+		text_file = open("template_" + lang + ".html", "r")
+		template = text_file.read()
+		text_file.close()
+		template = template.replace("${TRAIS_DATA}", data)	
+		handle = open("json/" + lang + "/annual" + str(NPRIID) + ".html",'w+')
+		handle.write(template)
+		handle.close();
+	
