@@ -177,8 +177,9 @@ class Substance:
 		result = result + "}"
 		return result
 class Facility:
-	def __init__(self, row):
+	def __init__(self, row, id):
 		self.row = row
+		self.id = id
 		self.substances = [Substance(row)]
 	def __str__(self):
 		result = "var info = {\n"
@@ -294,7 +295,7 @@ for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
 	NPRIID = row[0]
 	if (not (NPRIID in dataset)):		
-		facility = Facility(row)
+		facility = Facility(row, len(dataset) + 1)
 		dataset[NPRIID] = facility
 	else:
 		facility = dataset[NPRIID]
