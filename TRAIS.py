@@ -136,7 +136,12 @@ class Facility:
 			result = result + str(substance) + ","
 		result = result[:-1] + "]\n\t\t};";
 		return result
-
+	def getName(self):
+		facility.row[1] + "-" + facility.row[3]  + " [" +  self.row[9] + "]"
+	def getFirstLetterCompanyName(self):
+		return self.row[1][0]
+	def getODAstr(self):
+		return "{CompanyName:\"" + self.row[1] + "\",FacilityName:\"" + self.row[3] + "\"," + "NPRIID:\"" + str(int(self.row[0])) + "\"," + "City:\"" + self.row[9] + "\"," + "Substances:" + str(len(self.substances)) + "}" 
 #Create NAICS Dictionary
 NAICSDictionary = {}
 import fileinput
@@ -177,4 +182,38 @@ for key, value in dataset.iteritems():
 		handle = open("json/" + lang + "/annual" + str(NPRIID) + ".html",'w+')
 		handle.write(template)
 		handle.close();
+
+#Generate Data for ODA version
+ODADict = {}
+for key, facility in dataset.iteritems():
+	if type(key) is unicode and len(key) == 0:
+		continue
+	NPRIID = int(key)
+	firstLetter = facility.getFirstLetterCompanyName()
+	if (not (firstLetter in ODADict)):		
+		ODADict[firstLetter] = [facility]
+	else:
+		facilityList = ODADict[firstLetter]
+		facilityList.append(facility)
+
+result = "var facilityDict = [\n"
+for firstLetter in sorted(ODADict):
+	facilityList  = ODADict[firstLetter]
+	facilityList = sorted(facilityList, key= lambda fac: (fac.row[1], fac.row[3], fac.row[9]))   # sort by Company Name - Facility Name
+	result = result + "\t\t\t{index: \"" + firstLetter + "\",\n"
+	result = result + "\t\t\tfacilityList: ["
+	for facility in facilityList:
+		result = result + facility.getODAstr() + ","
+	result = result[:-1] + "]},\n"
+result = result[:-2] + "];\n"
+
+languages = ["EN", "FR"]
+for lang in languages:
+	text_file = open("ODAtemplate_" + lang + ".html", "r")
+	template = text_file.read()
+	text_file.close()
+	template = template.replace("${TRAIS_DATA}", result)	
+	handle = open("json/" + lang + "/oda.html",'w+')
+	handle.write(template)
+	handle.close();
 	
