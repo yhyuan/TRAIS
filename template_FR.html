@@ -82,7 +82,7 @@
 			<TR><TD>ID INRP:</TD><TD><%= info.NPRIID %></TD></TR>
 			<TR><TD>Personne-ressource:</TD><TD><%= info.PublicContact %><BR><%= info.PublicContactPhone %><BR><A HREF=mailto:<%= info.PublicContactEmail %>><%= info.PublicContactEmail %></A></TD></TR>
 			<TR><TD COLSPAN=2>&nbsp;<BR>Certifié par <U><%= info.HighestRankingEmployee %></U>, employé le plus élevé hiérarchiquement<BR>&nbsp;</TD></TR>
-			<TR><TD COLSPAN=2><A NAME="subst"></A>Liste des substances: 
+			<TR><TD COLSPAN=2><A NAME="subst"></A><%= ((info.hasOwnProperty("Substances") && info.Substances.length > 0)) ? "Liste des substances:" : "" %>			
             <%
                 _.each(info.Substances,function(substance,key,list){
             %>
@@ -92,6 +92,7 @@
             %>
 			<TR><TD COLSPAN=2><HR></TD><TR>			
 		</TABLE><P>
+			<%= ((info.hasOwnProperty("Substances") && info.Substances.length > 0)) ? "" : "Il n'y a pas d'information sur les substances toxiques fournie par cette entreprise ou installation<BR>" %>
             <%
                 _.each(info.Substances,function(substance,key,list){
             %>

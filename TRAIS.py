@@ -92,6 +92,8 @@ class Substance:
 		else:
 			return item
 	def __str__(self):
+		if len(self.row[28]) == 0:
+			return ""	
 		result = "{\n"
 		result = result + "\t\t\t\tName: \"" + self.row[28] + "\","
 		#result = result + "\t\t\t\tCode: \"" + self.getCode() + "\","
@@ -195,12 +197,16 @@ class Facility:
 		result = result + "\n\t\t\tPublicContactPhone: \"" + phone + "\","
 		result = result + "\n\t\t\tPublicContactEmail: \"" + self.row[23] + "\","
 		result = result + "\n\t\t\tHighestRankingEmployee: \"" + self.row[72] + "\","
-		result = result + "\n\t\t\tSubstances: ["
+		substanceResult = ""
 		for substance in self.substances:
 			substanceString = str(substance)
 			if len(substanceString) > 0:
-				result = result + substanceString + ","
-		result = result[:-1] + "]\n\t\t};";
+				substanceResult = substanceResult + substanceString + ","
+		if len(substanceResult) > 0:
+			result = result + "\n\t\t\tSubstances: [" + substanceResult[:-1] + "]";
+		else:
+			result = result[:-1]
+		result = result + "\n\t\t};"
 		return result
 
 	def getFeatureClassString(self):
@@ -237,7 +243,19 @@ class Facility:
 			result = result + "[" + substanceResult[:-1] + "]"
 		#result = result[:-1];		
 		return result
-		
+	def getGeoJson(self):
+		result = "\t\t{\n"
+		result = result + "\t\t\t\"type\": \"Feature\",\n"
+		result = result + "\t\t\t\"geometry\": {\n"
+		result = result + "\t\t\t\t\"type\": \"Point\",\n"
+		result = result + "\t\t\t\t\"coordinates\": [" + str(facility.row[17]) + ", " + str(facility.row[18]) +  "]\n"
+		result = result + "\t\t\t}, \n"
+		result = result + "\t\t\t\"properties\": {\n"
+		result = result + "\t\t\t\t\"Facility Name\": \"" + self.row[3] + "\",\n"
+		result = result + "\t\t\t\t\"Company Name\": \"" + self.row[1] + "\",\n"		
+		result = result + "\t\t\t}, \n"
+		result = result + "\t\t}"
+		return result
 	def getFirstLetterCompanyName(self):
 		return self.row[1][0]
 	def getODAstr(self):
@@ -352,6 +370,15 @@ for key, facility in dataset.iteritems():
 	#print str(facility)
 	result = result + facility.getFeatureClassString() + "\n"
 handle = open("json/TRAIS.txt",'w+')
+handle.write(result)
+handle.close();
+
+result = "{\n\t\"type\": \"FeatureCollection\",\n\t\"features\": ["
+for key, facility in dataset.iteritems():
+	result = result + facility.getGeoJson() + ",\n"
+result = result[:-2] + "\n\t]\n}"
+
+handle = open("TRAIS.json",'w+')
 handle.write(result)
 handle.close();
 

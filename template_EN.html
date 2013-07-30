@@ -82,7 +82,7 @@
 			<TR><TD>NPRI ID:</TD><TD><%= info.NPRIID %></TD></TR>
 			<TR><TD>Public Contact:</TD><TD><%= info.PublicContact %><BR><%= info.PublicContactPhone %><BR><A HREF=mailto:<%= info.PublicContactEmail %>><%= info.PublicContactEmail %></A></TD></TR>
 			<TR><TD COLSPAN=2>&nbsp;<BR>Certified by <U><%= info.HighestRankingEmployee %></U>, Highest Ranking Employee<BR>&nbsp;</TD></TR>
-			<TR><TD COLSPAN=2><A NAME="subst"></A>List of Substances: 
+			<TR><TD COLSPAN=2><A NAME="subst"></A><%= ((info.hasOwnProperty("Substances") && info.Substances.length > 0)) ? "List of Substances:" : "" %>
             <%
                 _.each(info.Substances,function(substance,key,list){
             %>
@@ -92,6 +92,7 @@
             %>
 			<TR><TD COLSPAN=2><HR></TD><TR>			
 		</TABLE><P>
+			<%= ((info.hasOwnProperty("Substances") && info.Substances.length > 0)) ? "" : "There is no substance information provided from this facility.<BR>" %>
             <%
                 _.each(info.Substances,function(substance,key,list){
             %>
