@@ -82,6 +82,8 @@ sys.setdefaultencoding("latin-1")
 class Substance:
 	def __init__(self, row):
 		self.row = row
+	def isEmpty(self):
+		return len(self.row[28]) == 0
 	def parse(self, item):
 		if (type(item) is unicode or type(item) is str) and len(item) == 0:
 			return 0
@@ -92,6 +94,7 @@ class Substance:
 	def __str__(self):
 		result = "{\n"
 		result = result + "\t\t\t\tName: \"" + self.row[28] + "\","
+		#result = result + "\t\t\t\tCode: \"" + self.getCode() + "\","
 		result = result + "\n\t\t\t\tUnits: \"" + self.row[30] + "\","
 		result = result + "\n\t\t\t\tUsed: \"" + str(self.row[31]) + "\","
 		result = result + "\n\t\t\t\tCreated: \"" + str(self.row[32]) + "\","
@@ -124,38 +127,49 @@ class Substance:
 					return substanceDictionary[key][0][1:-1]
 			# if failed again, try to add it to the dictionary. 
 			substanceDictionary[self.row[28]] = ["\"S" + str(len(substanceDictionary) + 1) + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[29] + "\""]
-			newsubstanceDictionary[self.row[28]] = ["\"S" + str(len(substanceDictionary) + 1) + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[29] + "\""]
+			newsubstanceDictionary[self.row[28]] = ["\"S" + str(len(substanceDictionary)) + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[29] + "\""]
 			return substanceDictionary[self.row[28]][0][1:-1]
 	def getFeatureClassString(self):
 		if len(self.row[28]) == 0:
 			return ""
-		result = "{Name:\"" + self.row[28] + "\","
+		#result = "{Name:\"" + self.row[28] + "\","
+		result = "{A:" + str(int(self.getCode()[1:])) + ","  #Name
 		if len(self.row[30]) > 0:
-			result = result + "Units:\"" + self.row[30] + "\"," 
+			#result = result + "Units:\"" + self.row[30] + "\"," 
+			result = result + "B:" + str(UnitsDict[self.row[30]]) + ","  # Units
 		if len(str(self.row[31])) > 0:
-			result = result + "Used: \"" + str(self.row[31]) + "\","
+			if str(self.row[31]) in RangeDict:
+				result = result + "C:\"I" + str(RangeDict[str(self.row[31])]) + "\","  # Used
+			else:
+				result = result + "C:\"" + str(self.row[31]) + "\","  # Used
 		if len(str(self.row[32])) > 0:
-			result = result + "Created: \"" + str(self.row[32]) + "\","
+			if str(self.row[32]) in RangeDict:
+				result = result + "D:\"I" + str(RangeDict[str(self.row[32])]) + "\","  # Created
+			else:		
+				result = result + "D:\"" + str(self.row[32]) + "\","  # Created
 		if len(str(self.row[33])) > 0:
-			result = result + "Contained: \"" + str(self.row[33]) + "\","
+			if str(self.row[33]) in RangeDict:
+				result = result + "E:\"I" + str(RangeDict[str(self.row[33])]) + "\","  # Contained
+			else:				
+				result = result + "E:\"" + str(self.row[33]) + "\"," # Contained
 		air = self.parse(self.row[35]) + self.parse(self.row[36]) + self.parse(self.row[37]) + self.parse(self.row[38])  + self.parse(self.row[39]) + self.parse(self.row[73])  #AJ, AK, AL, AM, AN, BV
 		if air > 0:
-			result = result + "Air: " + str(air) + ","
+			result = result + "F:" + str(air) + ","  # Air 
 		water = self.parse(self.row[40]) + self.parse(self.row[41]) + self.parse(self.row[42])  # AO, AP, AQ
 		if water > 0:
-			result = result + "Water: " + str(water) + ","
+			result = result + "G:" + str(water) + "," # Water
 		land = self.parse(self.row[43]) + self.parse(self.row[44]) + self.parse(self.row[45])   # AR, AS, AT
 		if land > 0:
-			result = result + "Land: " + str(land) + ","
+			result = result + "H:" + str(land) + "," #Land
 		disposalOnSite = self.parse(self.row[46]) + self.parse(self.row[47]) + self.parse(self.row[48])   # AU, AV, AW
 		if disposalOnSite > 0:
-			result = result + "DOnSite: " + str(disposalOnSite) + ","
+			result = result + "I:" + str(disposalOnSite) + ","  # DonSite
 		disposalOffSite = self.parse(self.row[49]) + self.parse(self.row[50]) + self.parse(self.row[51]) + self.parse(self.row[52]) + self.parse(self.row[53]) + self.parse(self.row[54]) + self.parse(self.row[55])  + self.parse(self.row[56]) + self.parse(self.row[57])   # AX, AY, AZ, BA, BB, BC, BD, BE, BF
 		if disposalOffSite > 0:
-			result = result + "DOffSite: " + str(disposalOffSite) + ","
+			result = result + "J:" + str(disposalOffSite) + "," # DoffSite
 		recycleOffSite = self.parse(self.row[62]) + self.parse(self.row[63]) + self.parse(self.row[64]) + self.parse(self.row[65]) + self.parse( self.row[66]) + self.parse(self.row[67]) + self.parse(self.row[68] ) + self.parse(self.row[69]) + self.parse(self.row[70]) + self.parse(self.row[71])   # BK, BL, BM, BN, BO, BP, BQ, BR, BS, BT
 		if recycleOffSite > 0:
-			result = result + "ROffSite: " + str(recycleOffSite)
+			result = result + "I:" + str(recycleOffSite)  # ROffSite
 		if result[-1] == ",":
 			result = result[:-1]
 		result = result + "}"
@@ -191,31 +205,37 @@ class Facility:
 
 	def getFeatureClassString(self):
 		result = str(facility.row[17]) + "\t" + str(facility.row[18])  + "\t" 
-		result = result +  str(self.row[2]) + "\t\"" +  str(self.row[3]) + "\"\t\"" + (str(self.row[8]) + " / " + str(self.row[9])) + "\"\t\"" 
+		result = result +  str(int(self.row[2])) + "\t\"" +  str(self.row[3]) + "\"\t\"" + (str(self.row[8]) + " / " + str(self.row[9])) + "\"\t\"" 
 		result = result +  self.row[1] + "\"\t" +  str(int(self.row[0])) + "\t" + str(int(self.row[6])) + "\t\"" 
-		result = result +  NAICSDictionary[str(int(self.row[6]))] + "\"\t" + str(len(self.substances)) + "\t\""
+		substances_number = len(self.substances)
+		if substances_number == 1 and self.substances[0].isEmpty():
+			substances_number = 0
+		result = result +  NAICSDictionary[str(int(self.row[6]))] + "\"\t" + str(substances_number) + "\t\""
 		#Substance Code List
 		for substance in self.substances:
 			code = substance.getCode()
 			if len(code) > 0:
 				result = result + code + "_"
-		result = result + "\"\t"
-		# Substances
-		result = result + "["
-		for substance in self.substances:
-			substanceString = substance.getFeatureClassString()
-			if len(substanceString) > 0:
-				result = result + substanceString + ","
-		result = result[:-1] + "]";
+		result = result + "\""
 		# Contact
-		result = result + "\t\"" + self.row[19] + "\"\t"
+		result = result + "\t\"" + self.row[19] + "\""
+		
 		if len(str(self.row[20])) == 0:
 			phone = ""
 		elif type(self.row[20]) is float:
 			phone = str(int(self.row[20]))
 		else:
 			phone = self.row[20]
-		result = result + "\t\"" + phone + "\"\t" + "\t\"" + self.row[23] + "\"\t" + "\t\"" + self.row[72] + "\""
+		result = result + "\t\"" + phone + "\"\t\"" + self.row[23] + "\"\t\"" + self.row[72] + "\"\t"
+		# Substances
+		substanceResult = ""
+		for substance in self.substances:
+			substanceString = substance.getFeatureClassString()
+			if len(substanceString) > 0:
+				substanceResult = substanceResult + substanceString + ","
+		if len(substanceResult) > 0:
+			result = result + "[" + substanceResult[:-1] + "]"
+		#result = result[:-1];		
 		return result
 		
 	def getFirstLetterCompanyName(self):
@@ -249,6 +269,7 @@ wb = xlrd.open_workbook('201305_TRAIScurrent.xls')
 sh = wb.sheet_by_name(u'Public Data')
 dataset = {}
 UnitsDict = {}
+RangeDict = {}
 
 for rownum in range(1, sh.nrows):
 	#print (sh.row_values(rownum))
@@ -263,6 +284,16 @@ for rownum in range(1, sh.nrows):
 	Units = row[30]
 	if (not (Units in UnitsDict)):		
 		UnitsDict[Units] = len(UnitsDict)
+	Used = str(row[31])
+	if (len(Used) > 1) and (Used[0] == ">") and (not (Used in RangeDict)):		
+		RangeDict[Used] = len(RangeDict)
+	Created = str(row[32])
+	if (len(Created) > 1) and (Created[0] == ">") and (not (Created in RangeDict)):		
+		RangeDict[Created] = len(RangeDict)
+	Contained = str(row[33])
+	if (len(Contained) > 1) and (Contained[0] == ">") and (not (Contained in RangeDict)):		
+		RangeDict[Contained] = len(RangeDict)
+	
 #Generate Reports
 for key, value in dataset.iteritems():
 	if type(key) is unicode and len(key) == 0:
@@ -314,7 +345,7 @@ for lang in languages:
 	handle.close();
 	
 # Generate txt file for feature class
-result = "FacilGeogrLatitude\tFacilGeogrLongitude\tFacilityID\tFacilityName\tAddress\tOrganizationName\tNPRI_ID\tSector\tSectorDesc\tNUMsubst\tSubstance_List\tSubstances\tContact\tPhone\tEmail\tHREmploy\n"
+result = "FacilGeogrLatitude\tFacilGeogrLongitude\tFacilityID\tFacilityName\tAddress\tOrganizationName\tNPRI_ID\tSector\tSectorDesc\tNUMsubst\tSubstance_List\tContact\tPhone\tEmail\tHREmploy\tSubs2010\n"
 for key, facility in dataset.iteritems():
 	if type(key) is unicode and len(key) == 0:
 		continue
@@ -326,3 +357,11 @@ handle.close();
 
 for key, substance in newsubstanceDictionary.iteritems():
 	print substance[0] + "\t" + substance[1] + "\t" + substance[2] + "\t" + substance[3]
+
+for Unit, index in UnitsDict.iteritems():
+	print Unit + "\t" + str(index)
+
+for Range, index in RangeDict.iteritems():
+	print Range + "\t" + str(index)
+
+	
