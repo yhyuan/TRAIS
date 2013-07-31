@@ -79,7 +79,7 @@ class Substance:
 			return substanceDictionary[self.SubstanceName][0][1:-1]
 	def getFeatureClassString(self):
 		if self.isEmpty():
-			return ""
+			return "\t\t\t\t\t\t\t\t\t\t"
 		return "\"" + self.SubstanceName + "\"\t\"" + self.Units + "\"\t\"" + self.Use + "\"\t\"" + self.Creation + "\"\t\"" + self.Contained + "\"\t\"" + self.ReleasestoAir + "\"\t\"" + self.ReleasestoWater + "\"\t\"" + self.ReleasestoLand + "\"\t\"" + self.DisposalOnSite + "\"\t\"" + self.DisposalOffSite + "\"\t\"" + self.RecycleOffSite + "\""
 class Facility:
 	def __init__(self, row, id):
@@ -88,17 +88,26 @@ class Facility:
 		
 		self.FacilityName =  row[FieldIndexDict["Facility Name"]]
 		self.OrganizationName =  row[FieldIndexDict["Organization Name"]]
-		self.Address =  row[FieldIndexDict["Street Address (Physical Address)"]] + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]
+		self.Address =  (row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]
 		self.City = row[FieldIndexDict["Municipality/City (Physical Address)"]]
 		self.Sector =  str(row[FieldIndexDict["NAICS"]]) + " - " + NAICSDictionary[str(int(row[FieldIndexDict["NAICS"]]))]
-		self.NPRIID =  str(int(row[FieldIndexDict["NPRI ID"]]))
+		NPRIID = row[FieldIndexDict["NPRI ID"]]
+		if (len(str(NPRIID)) > 0):
+			self.NPRIID = str(int(NPRIID))
+		else:
+			self.NPRIID = ""
 		self.PublicContact =  row[FieldIndexDict["Public Contact"]]
 		self.ContactTelephoneNumber =  self.formatPhone(row[FieldIndexDict["Contact Telephone Number"]])
 		self.ContactEmail =  row[FieldIndexDict["Contact Email"]]
 		self.HighestRankingEmployee =  row[FieldIndexDict["Highest Ranking Employee"]]
 		self.Latitude = str(row[FieldIndexDict["Latitude"]])
 		self.Longitude = str(row[FieldIndexDict["Longitude"]])
-		self.FacilityID =  str(int(row[FieldIndexDict["Facility ID"]]))
+		FacilityID = row[FieldIndexDict["Facility ID"]]
+		if (len(str(NPRIID)) > 0):
+			self.FacilityID = str(int(FacilityID))
+		else:
+			self.FacilityID = ""
+		#self.FacilityID =  str(int(row[FieldIndexDict["Facility ID"]]))
 		self.NAICS = str(int(row[FieldIndexDict["NAICS"]]))
 	def formatPhone(self, phoneInnput):
 		if len(str(phoneInnput)) == 0:
@@ -123,7 +132,7 @@ class Facility:
 		result = "var info = {\n" + "\t\t\tFacilityName: \"" + self.FacilityName + "\"," + "\n\t\t\tCompanyName: \"" + self.OrganizationName + "\"," + "\n\t\t\tAddress: \"" + self.Address + "\"," + "\n\t\t\tSector: \"" + self.Sector + "\"," + "\n\t\t\tNPRIID: \"" + self.NPRIID + "\"," + "\n\t\t\tPublicContact: \"" + self.PublicContact + "\"," + "\n\t\t\tPublicContactPhone: \"" + self.ContactTelephoneNumber + "\"," + "\n\t\t\tPublicContactEmail: \"" + self.ContactEmail + "\"," + "\n\t\t\tHighestRankingEmployee: \"" + self.HighestRankingEmployee + "\","
 		substanceResult = self.getSubstancesString()
 		if len(substanceResult) > 0:
-			result = result + "\n\t\t\tSubstances: [" + substanceResult[:-1] + "]";
+			result = result + "\n\t\t\tSubstances: [" + substanceResult + "]";
 		else:
 			result = result[:-1]
 		result = result + "\n\t\t};"
@@ -131,12 +140,15 @@ class Facility:
 
 	def getFeatureClassString(self):
 		return self.Latitude + "\t" + self.Longitude  + "\t" + self.FacilityID + "\t\"" +  self.FacilityName + "\"\t\"" + self.Address + "\"\t\"" + self.OrganizationName + "\"\t" +  self.NPRIID + "\t" + self.NAICS + "\t\"" + NAICSDictionary[self.NAICS] + "\"\t" + str(self.getSubstancesNumber() ) + "\t\""	+ self.getSubstancesCodeList() + "\"" + "\t\"" + self.PublicContact + "\"" + "\t\"" + self.ContactTelephoneNumber + "\"\t\"" + self.ContactEmail + "\"\t\"" + self.HighestRankingEmployee + "\"\t"
+		
+	def getReportString(self):
+		return "\"" +  self.FacilityName + "\"\t\"" + self.Address + "\"\t\"" + self.OrganizationName + "\"\t" +  self.NPRIID + "\t" + self.Sector + "\t\"" + self.PublicContact + "\"\t\"" + self.ContactTelephoneNumber + "\"\t\"" + self.ContactEmail + "\"\t\"" + self.HighestRankingEmployee + "\"\t"
 
 	def getFirstLetterCompanyName(self):
 		return self.OrganizationName[0]
 
 	def getODAstr(self):
-		return "{CompanyName:\"" + self.OrganizationName + "\",FacilityName:\"" + self.FacilityName + "\"," + "NPRIID:\"" + self.NPRIID + "\"," + "City:\"" + self.City + "\"," + "Substances:" + str(len(self.getSubstancesNumber())) + "}" 
+		return "{CompanyName:\"" + self.OrganizationName + "\",FacilityName:\"" + self.FacilityName + "\"," + "NPRIID:\"" + self.NPRIID + "\"," + "City:\"" + self.City + "\"," + "Substances:" + str(self.getSubstancesNumber()) + "}" 
 
 	
 
@@ -209,13 +221,24 @@ for lang in languages:
 	handle.close();
 	
 # Generate txt file for feature class
-result = "FacilGeogrLatitude\tFacilGeogrLongitude\tFacilityID\tFacilityName\tAddress\tOrganizationName\tNPRI_ID\tSector\tSectorDesc\tNUMsubst\tSubstance_List\tContact\tPhone\tEmail\tHREmploy\tSubs2010\n"
+result = "FacilGeogrLatitude\tFacilGeogrLongitude\tFacilityID\tFacilityName\tAddress\tOrganizationName\tNPRI_ID\tSector\tSectorDesc\tNUMsubst\tSubstance_List\tContact\tPhone\tEmail\tHREmploy\n"
 for key, facility in dataset.iteritems():
 	if type(key) is unicode and len(key) == 0:
 		continue
 	#print str(facility)
 	result = result + facility.getFeatureClassString() + "\n"
 handle = open("json/TRAIS.txt",'w+')
+handle.write(result)
+handle.close();
+
+# Generate txt file for feature class
+result = "FacilityName\tAddress\tOrganizationName\tNPRI_ID\tSector\tContact\tPhone\tEmail\tHREmploy\tSubstanceName\tUnits\tUse\tCreation\tContained\tReleasestoAir\tReleasestoWater\tReleasestoLand\tDisposalOnSite\tDisposalOffSite\tRecycleOffSite\n"
+for key, facility in dataset.iteritems():
+	if type(key) is unicode and len(key) == 0:
+		continue
+	for substance in facility.substances:
+		result = result + facility.getReportString() + "\t" + substance.getFeatureClassString() + "\n"
+handle = open("json/Substances.txt",'w+')
 handle.write(result)
 handle.close();
 
