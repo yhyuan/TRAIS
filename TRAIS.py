@@ -1,7 +1,4 @@
 # http://www.python-excel.org/
-'''
-
-'''
 import sys
 reload(sys)
 sys.setdefaultencoding("latin-1")
@@ -18,7 +15,7 @@ FieldIndexDict = {}
 for line in fileinput.input('FieldIndex.txt'):
 	items = line.strip().split("\t")
 	name = (items[0])
-	index = (items[1])
+	index = int(items[1])
 	FieldIndexDict[name] = index
 
 #Create substance Dictionary French
@@ -35,9 +32,27 @@ for line in fileinput.input('substance_codes.txt'):
 	
 class Substance:
 	def __init__(self, row):
-		self.row = row
+		#self.row = row
+		self.SubstanceName =  row[FieldIndexDict["Substance Name"]]
+		self.CASNumber =  row[FieldIndexDict["CAS Number"]]
+		self.Units =  row[FieldIndexDict["Units"]]
+		self.Use =  str(row[FieldIndexDict["Use (Amount Entered Facility)"]])
+		self.Creation =  str(row[FieldIndexDict["Creation  (Amount Created)"]])
+		self.Contained =  str(row[FieldIndexDict["Contained In Product (Amount In Product)"]])
+		air = self.parse(row[FieldIndexDict["Stack or Point (Releases to Air)"]]) + self.parse(row[FieldIndexDict["Storage or Handling (Releases to Air)"]]) + self.parse(row[FieldIndexDict["Fugitive (Releases to Air)"]]) + self.parse(row[FieldIndexDict["Spills (Releases to Air)"]])  + self.parse(row[FieldIndexDict["Other Non Point (Releases to Air)"]]) + self.parse(row[FieldIndexDict["Other Sources (VOC) (Releases to Air)"]])  #AJ, AK, AL, AM, AN, BV
+		self.ReleasestoAir =  str(air)
+		water = self.parse(row[FieldIndexDict["Direct Discharges (Releases to Water)"]]) + self.parse(row[FieldIndexDict["Spills (Releases to Water Bodies)"]]) + self.parse(row[FieldIndexDict["Leaks (Releases to Water Bodies)"]])  # AO, AP, AQ		
+		self.ReleasestoWater = str(water)
+		land = self.parse(row[FieldIndexDict["Spills (Releases to Land)"]]) + self.parse(row[FieldIndexDict["Leaks (Releases to Land)"]]) + self.parse(row[FieldIndexDict["Other (Releases to Land)"]])   # AR, AS, AT		
+		self.ReleasestoLand =  str(land)
+		disposalOnSite = self.parse(row[FieldIndexDict["Landfill (Onsite)"]]) + self.parse(row[FieldIndexDict["Land Treatment (Onsite)"]]) + self.parse(row[FieldIndexDict["Underground Injection (Onsite)"]])   # AU, AV, AW
+		self.DisposalOnSite = str(disposalOnSite)
+		disposalOffSite = self.parse(row[FieldIndexDict["Landfill (Offsite)"]]) + self.parse(row[FieldIndexDict["Land Treatment (Offsite)"]]) + self.parse(row[FieldIndexDict["Underground Injection (Offsite)"]]) + self.parse(row[FieldIndexDict["Storage (Offsite)"]]) + self.parse(row[FieldIndexDict["Physical (Offsite Treatment)"]]) + self.parse(row[FieldIndexDict["Chemical (Offsite Treatment)"]]) + self.parse(row[FieldIndexDict["Biological (Offsite Treatment)"]])  + self.parse(row[FieldIndexDict["Incineration Thermal (Offsite Treatment)"]]) + self.parse(row[FieldIndexDict["Municipal Sewage Treatment Plant (Offsite Treatment)"]])   # AX, AY, AZ, BA, BB, BC, BD, BE, BF
+		self.DisposalOffSite = str(disposalOffSite)		
+		recycleOffSite = self.parse(row[FieldIndexDict["Recovery of Energy (Recycling)"]]) + self.parse(row[FieldIndexDict["Recover of Solvents (Recycling)"]]) + self.parse(row[FieldIndexDict["Recovery of Organic Substances (Recycling)"]]) + self.parse(row[FieldIndexDict["Recovery of Metals and Metal Compounds (Recycling)"]]) + self.parse( row[FieldIndexDict["Recovery of Inorganic Materials (Recycling)"]]) + self.parse(row[FieldIndexDict["Recovery of Acids or Bases (Recycling)"]]) + self.parse(row[FieldIndexDict["Recovery of Catalysts (Recycling)"]] ) + self.parse(row[FieldIndexDict["Recovery of Pollution Abatement Residue (Recycling)"]]) + self.parse(row[FieldIndexDict["Refining of Reuse of Used Oil (Recycling)"]]) + self.parse(row[FieldIndexDict["Other (Recycling)"]])   # BK, BL, BM, BN, BO, BP, BQ, BR, BS, BT
+		self.RecycleOffSite = str(recycleOffSite)			
 	def isEmpty(self):
-		return len(self.row[28]) == 0
+		return len(self.SubstanceName) == 0
 	def parse(self, item):
 		if (type(item) is unicode or type(item) is str) and len(item) == 0:
 			return 0
@@ -46,109 +61,47 @@ class Substance:
 		else:
 			return item
 	def __str__(self):
-		if len(self.row[28]) == 0:
+		if self.isEmpty():
 			return ""	
-		result = "{\n"
-		result = result + "\t\t\t\tName: \"" + self.row[28] + "\","
-		#result = result + "\t\t\t\tCode: \"" + self.getCode() + "\","
-		result = result + "\n\t\t\t\tUnits: \"" + self.row[30] + "\","
-		result = result + "\n\t\t\t\tUsed: \"" + str(self.row[31]) + "\","
-		result = result + "\n\t\t\t\tCreated: \"" + str(self.row[32]) + "\","
-		result = result + "\n\t\t\t\tContained: \"" + str(self.row[33]) + "\","
-		air = self.parse(self.row[35]) + self.parse(self.row[36]) + self.parse(self.row[37]) + self.parse(self.row[38])  + self.parse(self.row[39]) + self.parse(self.row[73])  #AJ, AK, AL, AM, AN, BV
-		result = result + "\n\t\t\t\tAir: " + str(air) + ","
-		water = self.parse(self.row[40]) + self.parse(self.row[41]) + self.parse(self.row[42])  # AO, AP, AQ
-		result = result + "\n\t\t\t\tWater: " + str(water) + ","
-		land = self.parse(self.row[43]) + self.parse(self.row[44]) + self.parse(self.row[45])   # AR, AS, AT
-		result = result + "\n\t\t\t\tLand: " + str(land) + ","
-		disposalOnSite = self.parse(self.row[46]) + self.parse(self.row[47]) + self.parse(self.row[48])   # AU, AV, AW
-		result = result + "\n\t\t\t\tDOnSite: " + str(disposalOnSite) + ","
-		disposalOffSite = self.parse(self.row[49]) + self.parse(self.row[50]) + self.parse(self.row[51]) + self.parse(self.row[52]) + self.parse(self.row[53]) + self.parse(self.row[54]) + self.parse(self.row[55])  + self.parse(self.row[56]) + self.parse(self.row[57])   # AX, AY, AZ, BA, BB, BC, BD, BE, BF
-		result = result + "\n\t\t\t\tDOffSite: " + str(disposalOffSite) + ","
-		recycleOffSite = self.parse(self.row[62]) + self.parse(self.row[63]) + self.parse(self.row[64]) + self.parse(self.row[65]) + self.parse( self.row[66]) + self.parse(self.row[67]) + self.parse(self.row[68] ) + self.parse(self.row[69]) + self.parse(self.row[70]) + self.parse(self.row[71])   # BK, BL, BM, BN, BO, BP, BQ, BR, BS, BT
-		result = result + "\n\t\t\t\tROffSite: " + str(recycleOffSite)
-		result = result + "\n\t\t\t}"
-		return result
+		return "{\n" + "\t\t\t\tName: \"" + self.SubstanceName + "\"," + "\n\t\t\t\tUnits: \"" + self.Units + "\"," + "\n\t\t\t\tUsed: \"" + self.Use + "\"," + "\n\t\t\t\tCreated: \"" + self.Creation + "\"," + "\n\t\t\t\tContained: \"" + self.Contained + "\"," + "\n\t\t\t\tAir: " + self.ReleasestoAir + "," + "\n\t\t\t\tWater: " + self.ReleasestoWater + "," + "\n\t\t\t\tLand: " + self.ReleasestoLand + "," + "\n\t\t\t\tDOnSite: " + self.DisposalOnSite + "," + "\n\t\t\t\tDOffSite: " + self.DisposalOffSite + "," + "\n\t\t\t\tROffSite: " + self.RecycleOffSite + "\n\t\t\t}"
 	def getCode(self):
-		if len(self.row[28]) == 0:
+		if self.isEmpty():
 			return ""
 		# Find the code with substance name
-		if self.row[28] in substanceDictionary:
-			return substanceDictionary[self.row[28]][0][1:-1]
+		if self.SubstanceName in substanceDictionary:
+			return substanceDictionary[self.SubstanceName][0][1:-1]
 		else:
 			# If failed, try to find the code with CAS Number
-			CASNumber = self.row[29]
 			for key, value in substanceDictionary.iteritems():
-				if (CASNumber == value[3][1:-1]):
+				if (self.CASNumber == value[3][1:-1]):
 					return substanceDictionary[key][0][1:-1]
 			# if failed again, try to add it to the dictionary. 
-			substanceDictionary[self.row[28]] = ["\"S" + str(len(substanceDictionary) + 1) + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[29] + "\""]
-			newsubstanceDictionary[self.row[28]] = ["\"S" + str(len(substanceDictionary)) + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[28] + "\"", "\"" + self.row[29] + "\""]
-			return substanceDictionary[self.row[28]][0][1:-1]
+			substanceDictionary[self.SubstanceName] = ["\"S" + str(len(substanceDictionary) + 1) + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.CASNumber + "\""]
+			newsubstanceDictionary[self.SubstanceName] = ["\"S" + str(len(substanceDictionary)) + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.CASNumber + "\""]
+			return substanceDictionary[self.SubstanceName][0][1:-1]
 	def getFeatureClassString(self):
-		if len(self.row[28]) == 0:
+		if self.isEmpty():
 			return ""
-		#result = "{Name:\"" + self.row[28] + "\","
-		result = "{A:" + str(int(self.getCode()[1:])) + ","  #Name
-		if len(self.row[30]) > 0:
-			#result = result + "Units:\"" + self.row[30] + "\"," 
-			result = result + "B:" + str(UnitsDict[self.row[30]]) + ","  # Units
-		if len(str(self.row[31])) > 0:
-			if str(self.row[31]) in RangeDict:
-				result = result + "C:\"I" + str(RangeDict[str(self.row[31])]) + "\","  # Used
-			else:
-				result = result + "C:\"" + str(self.row[31]) + "\","  # Used
-		if len(str(self.row[32])) > 0:
-			if str(self.row[32]) in RangeDict:
-				result = result + "D:\"I" + str(RangeDict[str(self.row[32])]) + "\","  # Created
-			else:		
-				result = result + "D:\"" + str(self.row[32]) + "\","  # Created
-		if len(str(self.row[33])) > 0:
-			if str(self.row[33]) in RangeDict:
-				result = result + "E:\"I" + str(RangeDict[str(self.row[33])]) + "\","  # Contained
-			else:				
-				result = result + "E:\"" + str(self.row[33]) + "\"," # Contained
-		air = self.parse(self.row[35]) + self.parse(self.row[36]) + self.parse(self.row[37]) + self.parse(self.row[38])  + self.parse(self.row[39]) + self.parse(self.row[73])  #AJ, AK, AL, AM, AN, BV
-		if air > 0:
-			result = result + "F:" + str(air) + ","  # Air 
-		water = self.parse(self.row[40]) + self.parse(self.row[41]) + self.parse(self.row[42])  # AO, AP, AQ
-		if water > 0:
-			result = result + "G:" + str(water) + "," # Water
-		land = self.parse(self.row[43]) + self.parse(self.row[44]) + self.parse(self.row[45])   # AR, AS, AT
-		if land > 0:
-			result = result + "H:" + str(land) + "," #Land
-		disposalOnSite = self.parse(self.row[46]) + self.parse(self.row[47]) + self.parse(self.row[48])   # AU, AV, AW
-		if disposalOnSite > 0:
-			result = result + "I:" + str(disposalOnSite) + ","  # DonSite
-		disposalOffSite = self.parse(self.row[49]) + self.parse(self.row[50]) + self.parse(self.row[51]) + self.parse(self.row[52]) + self.parse(self.row[53]) + self.parse(self.row[54]) + self.parse(self.row[55])  + self.parse(self.row[56]) + self.parse(self.row[57])   # AX, AY, AZ, BA, BB, BC, BD, BE, BF
-		if disposalOffSite > 0:
-			result = result + "J:" + str(disposalOffSite) + "," # DoffSite
-		recycleOffSite = self.parse(self.row[62]) + self.parse(self.row[63]) + self.parse(self.row[64]) + self.parse(self.row[65]) + self.parse( self.row[66]) + self.parse(self.row[67]) + self.parse(self.row[68] ) + self.parse(self.row[69]) + self.parse(self.row[70]) + self.parse(self.row[71])   # BK, BL, BM, BN, BO, BP, BQ, BR, BS, BT
-		if recycleOffSite > 0:
-			result = result + "I:" + str(recycleOffSite)  # ROffSite
-		if result[-1] == ",":
-			result = result[:-1]
-		result = result + "}"
-		return result
+		return "\"" + self.SubstanceName + "\"\t\"" + self.Units + "\"\t\"" + self.Use + "\"\t\"" + self.Creation + "\"\t\"" + self.Contained + "\"\t\"" + self.ReleasestoAir + "\"\t\"" + self.ReleasestoWater + "\"\t\"" + self.ReleasestoLand + "\"\t\"" + self.DisposalOnSite + "\"\t\"" + self.DisposalOffSite + "\"\t\"" + self.RecycleOffSite + "\""
 class Facility:
 	def __init__(self, row, id):
-		self.row = row
 		self.id = id
 		self.substances = [Substance(row)]
 		
-		self.FacilityName =  self.row[FieldIndexDict["Facility Name"]]
-		self.OrganizationName =  self.row[FieldIndexDict["Organization Name"]]
-		self.Address =  self.row[FieldIndexDict["Street Address (Physical Address)"]] + " / " + self.row[FieldIndexDict["Municipality/City (Physical Address)"]]
-		self.Sector =  str(self.row[FieldIndexDict["NAICS"]]) + " - " + NAICSDictionary[str(int(self.row[FieldIndexDict["NAICS"]]))]
-		self.NPRIID =  str(int(self.row[FieldIndexDict["NPRI ID"]]))
-		self.PublicContact =  self.row[FieldIndexDict["Public Contact"]]
-		self.ContactTelephoneNumber =  self.formatPhone(self.row[FieldIndexDict["Contact Telephone Number"]])
-		self.ContactEmail =  self.row[FieldIndexDict["Contact Email"]]
-		self.HighestRankingEmployee =  self.row[FieldIndexDict["Highest Ranking Employee"]]
-		self.Latitude = str(self.row[FieldIndexDict["Latitude"]])
-		self.Longitude = str(self.row[FieldIndexDict["Longitude"]])
-		self.FacilityID =  str(int(self.row[FieldIndexDict["Facility ID"]]))
-		self.NAICS = str(int(self.row[FieldIndexDict["NAICS"]]))
+		self.FacilityName =  row[FieldIndexDict["Facility Name"]]
+		self.OrganizationName =  row[FieldIndexDict["Organization Name"]]
+		self.Address =  row[FieldIndexDict["Street Address (Physical Address)"]] + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]
+		self.City = row[FieldIndexDict["Municipality/City (Physical Address)"]]
+		self.Sector =  str(row[FieldIndexDict["NAICS"]]) + " - " + NAICSDictionary[str(int(row[FieldIndexDict["NAICS"]]))]
+		self.NPRIID =  str(int(row[FieldIndexDict["NPRI ID"]]))
+		self.PublicContact =  row[FieldIndexDict["Public Contact"]]
+		self.ContactTelephoneNumber =  self.formatPhone(row[FieldIndexDict["Contact Telephone Number"]])
+		self.ContactEmail =  row[FieldIndexDict["Contact Email"]]
+		self.HighestRankingEmployee =  row[FieldIndexDict["Highest Ranking Employee"]]
+		self.Latitude = str(row[FieldIndexDict["Latitude"]])
+		self.Longitude = str(row[FieldIndexDict["Longitude"]])
+		self.FacilityID =  str(int(row[FieldIndexDict["Facility ID"]]))
+		self.NAICS = str(int(row[FieldIndexDict["NAICS"]]))
 	def formatPhone(self, phoneInnput):
 		if len(str(phoneInnput)) == 0:
 			return ""
@@ -167,6 +120,7 @@ class Facility:
 		if substances_number == 1 and self.substances[0].isEmpty():
 			substances_number = 0
 		return substances_number
+
 	def __str__(self):
 		result = "var info = {\n" + "\t\t\tFacilityName: \"" + self.FacilityName + "\"," + "\n\t\t\tCompanyName: \"" + self.OrganizationName + "\"," + "\n\t\t\tAddress: \"" + self.Address + "\"," + "\n\t\t\tSector: \"" + self.Sector + "\"," + "\n\t\t\tNPRIID: \"" + self.NPRIID + "\"," + "\n\t\t\tPublicContact: \"" + self.PublicContact + "\"," + "\n\t\t\tPublicContactPhone: \"" + self.ContactTelephoneNumber + "\"," + "\n\t\t\tPublicContactEmail: \"" + self.ContactEmail + "\"," + "\n\t\t\tHighestRankingEmployee: \"" + self.HighestRankingEmployee + "\","
 		substanceResult = self.getSubstancesString()
@@ -179,21 +133,12 @@ class Facility:
 
 	def getFeatureClassString(self):
 		return self.Latitude + "\t" + self.Longitude  + "\t" + self.FacilityID + "\t\"" +  self.FacilityName + "\"\t\"" + self.Address + "\"\t\"" + self.OrganizationName + "\"\t" +  self.NPRIID + "\t" + self.NAICS + "\t\"" + NAICSDictionary[self.NAICS] + "\"\t" + str(self.getSubstancesNumber() ) + "\t\""	+ self.getSubstancesCodeList() + "\"" + "\t\"" + self.PublicContact + "\"" + "\t\"" + self.ContactTelephoneNumber + "\"\t\"" + self.ContactEmail + "\"\t\"" + self.HighestRankingEmployee + "\"\t"
-		# Substances
-		#substanceResult = ""
-		#for substance in self.substances:
-		#	substanceString = substance.getFeatureClassString()
-		#	if len(substanceString) > 0:
-		#		substanceResult = substanceResult + substanceString + ","
-		#if len(substanceResult) > 0:
-		#	result = result + "[" + substanceResult[:-1] + "]"
-		#result = result[:-1];		
-		#return result
 
 	def getFirstLetterCompanyName(self):
 		return self.OrganizationName[0]
+
 	def getODAstr(self):
-		return "{CompanyName:\"" + self.row[1] + "\",FacilityName:\"" + self.row[3] + "\"," + "NPRIID:\"" + str(int(self.row[0])) + "\"," + "City:\"" + self.row[9] + "\"," + "Substances:" + str(len(self.substances)) + "}" 
+		return "{CompanyName:\"" + self.OrganizationName + "\",FacilityName:\"" + self.FacilityName + "\"," + "NPRIID:\"" + self.NPRIID + "\"," + "City:\"" + self.City + "\"," + "Substances:" + str(len(self.getSubstancesNumber())) + "}" 
 
 	
 
