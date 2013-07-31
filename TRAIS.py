@@ -1,84 +1,38 @@
 # http://www.python-excel.org/
 '''
-NPRI ID	0
-Organization Name	1
-Facility ID	2
-Facility Name	3
-Relationship Type	4
-MOE REG127 Number	5
-NAICS	6
-Number of Employees	7
-Street Address (Physical Address)	8
-"Municipality/City (Physical Address)"	9
-Province (Physical Address)	10
-PostalZip (Physical Address)	11
-Country (Physical Address)	12
-Additional Information (Physical Address)	13
-UTM Zone	14
-UTM Easting	15
-UTM Northing	16
-Latitude	17
-Longitude	18
-Public Contact	19
-Contact Telephone Number	20
-Contact Telephone Extension	21
-Contact Fax Number	22
-Contact Email	23
-Contact Language Correspondence	24
-Contact Position	25
-Parent Legal Name	26
-Parent Percentage Owned	27
-Substance Name	28
-CAS Number	29
-Units	30
-Use (Amount Entered Facility)	31
-Creation  (Amount Created)	32
-Contained In Product (Amount In Product)	33
-Report Sum of All Media	34
-Stack or Point (Releases to Air)	35
-Storage or Handling (Releases to Air)	36
-Fugitive (Releases to Air)	37
-Spills (Releases to Air)	38
-Other Non Point (Releases to Air)	39
-Direct Discharges (Releases to Water)	40
-Spills (Releases to Water Bodies)	41
-Leaks (Releases to Water Bodies)	42
-Spills (Releases to Land)	43
-Leaks (Releases to Land)	44
-Other (Releases to Land)	45
-Landfill (Onsite)	46
-Land Treatment (Onsite)	47
-Underground Injection (Onsite)	48
-Landfill (Offsite)	49
-Land Treatment (Offsite)	50
-Underground Injection (Offsite)	51
-Storage (Offsite)	52
-Physical (Offsite Treatment)	53
-Chemical (Offsite Treatment)	54
-Biological (Offsite Treatment)	55
-Incineration Thermal (Offsite Treatment)	56
-Municipal Sewage Treatment Plant (Offsite Treatment)	57
-Tailings Management (Onsite)	58
-Waste Rock Management (Onsite)	59
-Tailings Management (Offsite)	60
-Waste Rock Management (Offsite)	61
-Recovery of Energy (Recycling)	62
-Recover of Solvents (Recycling)	63
-Recovery of Organic Substances (Recycling)	64
-Recovery of Metals and Metal Compounds (Recycling)	65
-Recovery of Inorganic Materials (Recycling)	66
-Recovery of Acids or Bases (Recycling)	67
-Recovery of Catalysts (Recycling)	68
-Recovery of Pollution Abatement Residue (Recycling)	69
-Refining of Reuse of Used Oil (Recycling)	70
-Other (Recycling)	71
-Highest Ranking Employee	72
-Other Sources (VOC) (Releases to Air)	73
+
 '''
 import sys
 reload(sys)
 sys.setdefaultencoding("latin-1")
+import fileinput
+#Create NAICS Dictionary
+NAICSDictionary = {}
+for line in fileinput.input('NAICS.txt'):
+	items = line.strip().split("\t")
+	code = (items[0])
+	name = (items[1])[1:-1]
+	NAICSDictionary[code] = name
 
+FieldIndexDict = {}
+for line in fileinput.input('FieldIndex.txt'):
+	items = line.strip().split("\t")
+	name = (items[0])
+	index = (items[1])
+	FieldIndexDict[name] = index
+
+#Create substance Dictionary French
+substanceDictionary = {}
+newsubstanceDictionary = {}
+i = 0
+for line in fileinput.input('substance_codes.txt'):
+	i = i + 1
+	if i == 1:
+		continue  # skip the first line
+	items = line.strip().split("\t")
+	code = (items[1])[1:-1]
+	substanceDictionary[code] = items  # CODE	SUBSTANCE_EN	SUBSTANCE_FR	CAS
+	
 class Substance:
 	def __init__(self, row):
 		self.row = row
@@ -181,28 +135,41 @@ class Facility:
 		self.row = row
 		self.id = id
 		self.substances = [Substance(row)]
+		
+		self.FacilityName =  self.row[FieldIndexDict["Facility Name"]]
+		self.OrganizationName =  self.row[FieldIndexDict["Organization Name"]]
+		self.Address =  self.row[FieldIndexDict["Street Address (Physical Address)"]] + " / " + self.row[FieldIndexDict["Municipality/City (Physical Address)"]]
+		self.Sector =  str(self.row[FieldIndexDict["NAICS"]]) + " - " + NAICSDictionary[str(int(self.row[FieldIndexDict["NAICS"]]))]
+		self.NPRIID =  str(int(self.row[FieldIndexDict["NPRI ID"]]))
+		self.PublicContact =  self.row[FieldIndexDict["Public Contact"]]
+		self.ContactTelephoneNumber =  self.formatPhone(self.row[FieldIndexDict["Contact Telephone Number"]])
+		self.ContactEmail =  self.row[FieldIndexDict["Contact Email"]]
+		self.HighestRankingEmployee =  self.row[FieldIndexDict["Highest Ranking Employee"]]
+		self.Latitude = str(self.row[FieldIndexDict["Latitude"]])
+		self.Longitude = str(self.row[FieldIndexDict["Longitude"]])
+		self.FacilityID =  str(int(self.row[FieldIndexDict["Facility ID"]]))
+		self.NAICS = str(int(self.row[FieldIndexDict["NAICS"]]))
+	def formatPhone(self, phoneInnput):
+		if len(str(phoneInnput)) == 0:
+			return ""
+		elif type(phoneInnput) is float:
+			return str(int(phoneInnput))
+		return phoneInnput
+	def getSubstancesString(self):
+		def getString(x): return str(x)
+		substancesStringList = map(getString, self.substances)
+		return ",".join(map(getString, self.substances))
+	def getSubstancesCodeList(self):
+		def getCode(substance): return substance.getCode()
+		return "_".join(map(getCode, self.substances)) + "_"
+	def getSubstancesNumber(self):
+		substances_number = len(self.substances)
+		if substances_number == 1 and self.substances[0].isEmpty():
+			substances_number = 0
+		return substances_number
 	def __str__(self):
-		result = "var info = {\n"
-		result = result + "\t\t\tFacilityName: \"" + self.row[3] + "\","
-		result = result + "\n\t\t\tCompanyName: \"" + self.row[1] + "\","
-		result = result + "\n\t\t\tAddress: \"" + self.row[8] + " / " + self.row[9] + "\","
-		result = result + "\n\t\t\tSector: \"" + str(int(self.row[6])) + " - " + NAICSDictionary[str(int(self.row[6]))] + "\","
-		result = result + "\n\t\t\tNPRIID: \"" + str(int(self.row[0])) + "\","
-		result = result + "\n\t\t\tPublicContact: \"" + (self.row[19]) + "\","
-		if len(str(self.row[20])) == 0:
-			phone = ""
-		elif type(self.row[20]) is float:
-			phone = str(int(self.row[20]))
-		else:
-			phone = self.row[20]
-		result = result + "\n\t\t\tPublicContactPhone: \"" + phone + "\","
-		result = result + "\n\t\t\tPublicContactEmail: \"" + self.row[23] + "\","
-		result = result + "\n\t\t\tHighestRankingEmployee: \"" + self.row[72] + "\","
-		substanceResult = ""
-		for substance in self.substances:
-			substanceString = str(substance)
-			if len(substanceString) > 0:
-				substanceResult = substanceResult + substanceString + ","
+		result = "var info = {\n" + "\t\t\tFacilityName: \"" + self.FacilityName + "\"," + "\n\t\t\tCompanyName: \"" + self.OrganizationName + "\"," + "\n\t\t\tAddress: \"" + self.Address + "\"," + "\n\t\t\tSector: \"" + self.Sector + "\"," + "\n\t\t\tNPRIID: \"" + self.NPRIID + "\"," + "\n\t\t\tPublicContact: \"" + self.PublicContact + "\"," + "\n\t\t\tPublicContactPhone: \"" + self.ContactTelephoneNumber + "\"," + "\n\t\t\tPublicContactEmail: \"" + self.ContactEmail + "\"," + "\n\t\t\tHighestRankingEmployee: \"" + self.HighestRankingEmployee + "\","
+		substanceResult = self.getSubstancesString()
 		if len(substanceResult) > 0:
 			result = result + "\n\t\t\tSubstances: [" + substanceResult[:-1] + "]";
 		else:
@@ -211,76 +178,25 @@ class Facility:
 		return result
 
 	def getFeatureClassString(self):
-		result = str(facility.row[17]) + "\t" + str(facility.row[18])  + "\t" 
-		result = result +  str(int(self.row[2])) + "\t\"" +  str(self.row[3]) + "\"\t\"" + (str(self.row[8]) + " / " + str(self.row[9])) + "\"\t\"" 
-		result = result +  self.row[1] + "\"\t" +  str(int(self.row[0])) + "\t" + str(int(self.row[6])) + "\t\"" 
-		substances_number = len(self.substances)
-		if substances_number == 1 and self.substances[0].isEmpty():
-			substances_number = 0
-		result = result +  NAICSDictionary[str(int(self.row[6]))] + "\"\t" + str(substances_number) + "\t\""
-		#Substance Code List
-		for substance in self.substances:
-			code = substance.getCode()
-			if len(code) > 0:
-				result = result + code + "_"
-		result = result + "\""
-		# Contact
-		result = result + "\t\"" + self.row[19] + "\""
-		
-		if len(str(self.row[20])) == 0:
-			phone = ""
-		elif type(self.row[20]) is float:
-			phone = str(int(self.row[20]))
-		else:
-			phone = self.row[20]
-		result = result + "\t\"" + phone + "\"\t\"" + self.row[23] + "\"\t\"" + self.row[72] + "\"\t"
+		return self.Latitude + "\t" + self.Longitude  + "\t" + self.FacilityID + "\t\"" +  self.FacilityName + "\"\t\"" + self.Address + "\"\t\"" + self.OrganizationName + "\"\t" +  self.NPRIID + "\t" + self.NAICS + "\t\"" + NAICSDictionary[self.NAICS] + "\"\t" + str(self.getSubstancesNumber() ) + "\t\""	+ self.getSubstancesCodeList() + "\"" + "\t\"" + self.PublicContact + "\"" + "\t\"" + self.ContactTelephoneNumber + "\"\t\"" + self.ContactEmail + "\"\t\"" + self.HighestRankingEmployee + "\"\t"
 		# Substances
-		substanceResult = ""
-		for substance in self.substances:
-			substanceString = substance.getFeatureClassString()
-			if len(substanceString) > 0:
-				substanceResult = substanceResult + substanceString + ","
-		if len(substanceResult) > 0:
-			result = result + "[" + substanceResult[:-1] + "]"
+		#substanceResult = ""
+		#for substance in self.substances:
+		#	substanceString = substance.getFeatureClassString()
+		#	if len(substanceString) > 0:
+		#		substanceResult = substanceResult + substanceString + ","
+		#if len(substanceResult) > 0:
+		#	result = result + "[" + substanceResult[:-1] + "]"
 		#result = result[:-1];		
-		return result
-	def getGeoJson(self):
-		result = "\t\t{\n"
-		result = result + "\t\t\t\"type\": \"Feature\",\n"
-		result = result + "\t\t\t\"geometry\": {\n"
-		result = result + "\t\t\t\t\"type\": \"Point\",\n"
-		result = result + "\t\t\t\t\"coordinates\": [" + str(facility.row[17]) + ", " + str(facility.row[18]) +  "]\n"
-		result = result + "\t\t\t}, \n"
-		result = result + "\t\t\t\"properties\": {\n"
-		result = result + "\t\t\t\t\"Facility Name\": \"" + self.row[3] + "\",\n"
-		result = result + "\t\t\t\t\"Company Name\": \"" + self.row[1] + "\",\n"		
-		result = result + "\t\t\t}, \n"
-		result = result + "\t\t}"
-		return result
+		#return result
+
 	def getFirstLetterCompanyName(self):
-		return self.row[1][0]
+		return self.OrganizationName[0]
 	def getODAstr(self):
 		return "{CompanyName:\"" + self.row[1] + "\",FacilityName:\"" + self.row[3] + "\"," + "NPRIID:\"" + str(int(self.row[0])) + "\"," + "City:\"" + self.row[9] + "\"," + "Substances:" + str(len(self.substances)) + "}" 
-#Create NAICS Dictionary
-NAICSDictionary = {}
-import fileinput
-for line in fileinput.input('NAICS.txt'):
-	items = line.strip().split("\t")
-	code = (items[0])
-	name = (items[1])[1:-1]
-	NAICSDictionary[code] = name
 
-#Create substance Dictionary French
-substanceDictionary = {}
-newsubstanceDictionary = {}
-i = 0
-for line in fileinput.input('substance_codes.txt'):
-	i = i + 1
-	if i == 1:
-		continue  # skip the first line
-	items = line.strip().split("\t")
-	code = (items[1])[1:-1]
-	substanceDictionary[code] = items  # CODE	SUBSTANCE_EN	SUBSTANCE_FR	CAS
+	
+
 
 #Read Excel File	
 import xlrd
