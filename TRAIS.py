@@ -2,6 +2,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding("latin-1")
+
 import fileinput
 #Create NAICS Dictionary
 NAICSDictionary = {}
@@ -20,7 +21,6 @@ for line in fileinput.input('FieldIndex.txt'):
 
 #Create substance Dictionary French
 substanceDictionary = {}
-newsubstanceDictionary = {}
 i = 0
 for line in fileinput.input('substance_codes.txt'):
 	i = i + 1
@@ -32,7 +32,6 @@ for line in fileinput.input('substance_codes.txt'):
 	
 class Substance:
 	def __init__(self, row):
-		#self.row = row
 		self.SubstanceName =  row[FieldIndexDict["Substance Name"]]
 		self.CASNumber =  row[FieldIndexDict["CAS Number"]]
 		self.Units =  row[FieldIndexDict["Units"]]
@@ -77,7 +76,6 @@ class Substance:
 					return substanceDictionary[key][0][1:-1]
 			# if failed again, try to add it to the dictionary. 
 			substanceDictionary[self.SubstanceName] = ["\"S" + str(len(substanceDictionary) + 1) + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.CASNumber + "\""]
-			newsubstanceDictionary[self.SubstanceName] = ["\"S" + str(len(substanceDictionary)) + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.SubstanceName + "\"", "\"" + self.CASNumber + "\""]
 			return substanceDictionary[self.SubstanceName][0][1:-1]
 	def getFeatureClassString(self):
 		if self.isEmpty():
@@ -148,8 +146,6 @@ import xlrd
 wb = xlrd.open_workbook('201305_TRAIScurrent.xls')
 sh = wb.sheet_by_name(u'Public Data')
 dataset = {}
-UnitsDict = {}
-RangeDict = {}
 
 for rownum in range(1, sh.nrows):
 	#print (sh.row_values(rownum))
@@ -161,18 +157,6 @@ for rownum in range(1, sh.nrows):
 	else:
 		facility = dataset[NPRIID]
 		facility.substances.append(Substance(row))
-	Units = row[30]
-	if (not (Units in UnitsDict)):		
-		UnitsDict[Units] = len(UnitsDict)
-	Used = str(row[31])
-	if (len(Used) > 1) and (Used[0] == ">") and (not (Used in RangeDict)):		
-		RangeDict[Used] = len(RangeDict)
-	Created = str(row[32])
-	if (len(Created) > 1) and (Created[0] == ">") and (not (Created in RangeDict)):		
-		RangeDict[Created] = len(RangeDict)
-	Contained = str(row[33])
-	if (len(Contained) > 1) and (Contained[0] == ">") and (not (Contained in RangeDict)):		
-		RangeDict[Contained] = len(RangeDict)
 	
 #Generate Reports
 for key, value in dataset.iteritems():
@@ -206,7 +190,7 @@ for key, facility in dataset.iteritems():
 result = "var facilityDict = [\n"
 for firstLetter in sorted(ODADict):
 	facilityList  = ODADict[firstLetter]
-	facilityList = sorted(facilityList, key= lambda fac: (fac.row[1], fac.row[3], fac.row[9]))   # sort by Company Name - Facility Name
+	facilityList = sorted(facilityList, key= lambda fac: (fac.OrganizationName, fac.FacilityName, fac.City))   # sort by Company Name - Facility Name
 	result = result + "\t\t\t{index: \"" + firstLetter + "\",\n"
 	result = result + "\t\t\tfacilityList: ["
 	for facility in facilityList:
@@ -235,22 +219,7 @@ handle = open("json/TRAIS.txt",'w+')
 handle.write(result)
 handle.close();
 
-result = "{\n\t\"type\": \"FeatureCollection\",\n\t\"features\": ["
-for key, facility in dataset.iteritems():
-	result = result + facility.getGeoJson() + ",\n"
-result = result[:-2] + "\n\t]\n}"
-
-handle = open("TRAIS.json",'w+')
-handle.write(result)
-handle.close();
-
-for key, substance in newsubstanceDictionary.iteritems():
+for key, substance in substanceDictionary.iteritems():
 	print substance[0] + "\t" + substance[1] + "\t" + substance[2] + "\t" + substance[3]
-
-for Unit, index in UnitsDict.iteritems():
-	print Unit + "\t" + str(index)
-
-for Range, index in RangeDict.iteritems():
-	print Range + "\t" + str(index)
 
 	
