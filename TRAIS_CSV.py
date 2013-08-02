@@ -67,19 +67,72 @@ import xlrd
 wb = xlrd.open_workbook('201305_TRAIScurrent.xls')
 sh = wb.sheet_by_name(u'Public Data')
 traisExcelList = map(lambda rownum: sh.row_values(rownum), range(1, sh.nrows))
-facilityListfunc = lambda row: ("0.0000" if (len(str(row[FieldIndexDict["Latitude"]])) == 0) else str(row[FieldIndexDict["Latitude"]])) + "\t" + ("0.0000" if (len(str(row[FieldIndexDict["Longitude"]])) == 0) else str(row[FieldIndexDict["Longitude"]])) + "\t" + (str(int(row[FieldIndexDict["Facility ID"]])) if (len(str(row[FieldIndexDict["Facility ID"]])) > 0) else "") + "\t\"" +  row[FieldIndexDict["Facility Name"]] + "\"\t\"" + ((row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]) + "\"\t\"" + row[FieldIndexDict["Organization Name"]] + "\"\t\"" +  ((str(int(row[FieldIndexDict["NPRI ID"]]) + 10000000000)[1:]) if (len(str(row[FieldIndexDict["NPRI ID"]])) > 0) else "") + "\"\t" + (str(row[FieldIndexDict["NAICS"]]) + "\t\"" + NAICSDictionary[str(int(row[FieldIndexDict["NAICS"]]))]) + "\"" 
-facilityDuplicatedList = map(facilityListfunc, traisExcelList)
-#import collections
-#substanceCounter = collections.Counter(facilityDuplicatedList)
-
-facilityList = list(set(facilityDuplicatedList))
-facilityListDict = dict((fac,[]) for fac in facilityList)
-facilityListWithSubstancesfunc = lambda row: ("0.0000" if (len(str(row[FieldIndexDict["Latitude"]])) == 0) else str(row[FieldIndexDict["Latitude"]])) + "\t" + ("0.0000" if (len(str(row[FieldIndexDict["Longitude"]])) == 0) else str(row[FieldIndexDict["Longitude"]])) + "\t" + (str(int(row[FieldIndexDict["Facility ID"]])) if (len(str(row[FieldIndexDict["Facility ID"]])) > 0) else "") + "\t\"" +  row[FieldIndexDict["Facility Name"]] + "\"\t\"" + ((row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]) + "\"\t\"" + row[FieldIndexDict["Organization Name"]] + "\"\t\"" +  ((str(int(row[FieldIndexDict["NPRI ID"]]) + 10000000000)[1:]) if (len(str(row[FieldIndexDict["NPRI ID"]])) > 0) else "") + "\"\t" + (str(row[FieldIndexDict["NAICS"]]) + "\t\"" + NAICSDictionary[str(int(row[FieldIndexDict["NAICS"]]))]) + "\"\t"  + getCode(row[FieldIndexDict["Substance Name"]], row[FieldIndexDict["CAS Number"]]) + ""
+def facilityListWithSubstancesfunc(row):
+	latitude = str(row[FieldIndexDict["Latitude"]])
+	latitude = "0.0000" if (len(latitude) == 0)
+	longitude = str(row[FieldIndexDict["Longitude"]])
+	longitude = "0.0000" if (len(longitude) == 0)
+	FacilityID = str(row[FieldIndexDict["Facility ID"]])
+	FacilityID = "" if (len(FacilityID) == 0)
+	FacilityName = row[FieldIndexDict["Facility Name"]]
+	Address = ((row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]])
+	OrganizationName = row[FieldIndexDict["Organization Name"]]
+	NPRIID = str(row[FieldIndexDict["NPRI ID"]])
+	NPRIID = ((str(int(NPRIID) + 10000000000)[1:]) if (len(NPRIID) > 0) else "")
+	NAICS = str(row[FieldIndexDict["NAICS"]])
+	SectorDesc = NAICSDictionary[str(int(NAICS))]
+	code = getCode(row[FieldIndexDict["Substance Name"]], row[FieldIndexDict["CAS Number"]])
+	return [FacilityID, FacilityName, Address, OrganizationName, NPRIID, NAICS, SectorDesc, code]
+#	coorList = [latitude, longitude]
+#	otherList = [FacilityID, FacilityName, Address, OrganizationName, NPRIID, NAICS, SectorDesc, code]
+#	return "\t".join(coorList) + "\t\"" + "\"\t\"".join(otherList) + "\""
 facilityDuplicatedListWithSubstances = map(facilityListWithSubstancesfunc, traisExcelList)
+'''
+def facilityListfunc(row):
+	latitude = str(row[FieldIndexDict["Latitude"]])
+	latitude = "0.0000" if (len(latitude) == 0)
+	longitude = str(row[FieldIndexDict["Longitude"]])
+	longitude = "0.0000" if (len(longitude) == 0)
+	FacilityID = str(row[FieldIndexDict["Facility ID"]])
+	FacilityID = "" if (len(FacilityID) == 0)
+	FacilityName = row[FieldIndexDict["Facility Name"]]
+	Address = ((row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]])
+	OrganizationName = row[FieldIndexDict["Organization Name"]]
+	NPRIID = str(row[FieldIndexDict["NPRI ID"]])
+	NPRIID = ((str(int(NPRIID) + 10000000000)[1:]) if (len(NPRIID) > 0) else "")
+	NAICS = str(row[FieldIndexDict["NAICS"]])
+	SectorDesc = NAICSDictionary[str(int(NAICS))]
+	coorList = [latitude, longitude]
+	otherList = [FacilityID, FacilityName, Address, OrganizationName, NPRIID, NAICS, SectorDesc]
+	return "\t".join(coorList) + "\t\"" + "\"\t\"".join(otherList) + "\""
+'''
+#facilityListfunc = lambda row: ("0.0000" if (len(str(row[FieldIndexDict["Latitude"]])) == 0) else str(row[FieldIndexDict["Latitude"]])) + "\t" + ("0.0000" if (len(str(row[FieldIndexDict["Longitude"]])) == 0) else str(row[FieldIndexDict["Longitude"]])) + "\t" + (str(int(row[FieldIndexDict["Facility ID"]])) if (len(str(row[FieldIndexDict["Facility ID"]])) > 0) else "") + "\t\"" +  row[FieldIndexDict["Facility Name"]] + "\"\t\"" + ((row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]) + "\"\t\"" + row[FieldIndexDict["Organization Name"]] + "\"\t\"" +  ((str(int(row[FieldIndexDict["NPRI ID"]]) + 10000000000)[1:]) if (len(str(row[FieldIndexDict["NPRI ID"]])) > 0) else "") + "\"\t" + (str(row[FieldIndexDict["NAICS"]]) + "\t\"" + NAICSDictionary[str(int(row[FieldIndexDict["NAICS"]]))]) + "\"" 
+#facilityDuplicatedList = map(facilityListfunc, traisExcelList)
+#facilityDuplicatedList = map(lambda list: list[:-1], facilityDuplicatedListWithSubstances)
+
+facilityList = list(set(map(lambda list: list[:-1], facilityDuplicatedListWithSubstances)))
+facilityListDict = dict((fac,[]) for fac in facilityList)
+#facilityListWithSubstancesfunc = lambda row: ("0.0000" if (len(str(row[FieldIndexDict["Latitude"]])) == 0) else str(row[FieldIndexDict["Latitude"]])) + "\t" + ("0.0000" if (len(str(row[FieldIndexDict["Longitude"]])) == 0) else str(row[FieldIndexDict["Longitude"]])) + "\t" + (str(int(row[FieldIndexDict["Facility ID"]])) if (len(str(row[FieldIndexDict["Facility ID"]])) > 0) else "") + "\t\"" +  row[FieldIndexDict["Facility Name"]] + "\"\t\"" + ((row[FieldIndexDict["Street Address (Physical Address)"]]).strip() + " / " + row[FieldIndexDict["Municipality/City (Physical Address)"]]) + "\"\t\"" + row[FieldIndexDict["Organization Name"]] + "\"\t\"" +  ((str(int(row[FieldIndexDict["NPRI ID"]]) + 10000000000)[1:]) if (len(str(row[FieldIndexDict["NPRI ID"]])) > 0) else "") + "\"\t" + (str(row[FieldIndexDict["NAICS"]]) + "\t\"" + NAICSDictionary[str(int(row[FieldIndexDict["NAICS"]]))]) + "\"\t"  + getCode(row[FieldIndexDict["Substance Name"]], row[FieldIndexDict["CAS Number"]]) + ""
+
 #def addFacilityListDict(line):
 		
 #Add Elements to the lists in facilityListDict
-map(lambda line: (facilityListDict["\t".join(line.split("\t")[:-1])]).append(line.split("\t")[-1]), facilityDuplicatedListWithSubstances)
+#map(lambda line: (facilityListDict["\t".join(line.split("\t")[:-1])]).append(line.split("\t")[-1]), facilityDuplicatedListWithSubstances)
+def addFacilityDict(fac):
+	facilityListDict[fac[:-1]].append(fac[-1])
+map(addFacilityDict, facilityDuplicatedListWithSubstances)
+
+def addFacilityID(i):
+subNum = 0
+	subNum = 0
+	subList = "_".join(facilityListDict[facilityList[i]])
+	if len(subList) != 0:
+		subNum = len(facilityListDict[facilityList[i]]))
+		subList = subList + "_"
+	facilityList[i].append(str(i))
+	facilityList[i].append(str(subNum))
+	facilityList[i].append(str(subList))
+	
 facilityListID = map(lambda i: str(i) + "\t" + facilityList[i] + "\t" + str(0 if (len("_".join(facilityListDict[facilityList[i]])) == 0) else len(facilityListDict[facilityList[i]])) + "\t\"" + "_".join(facilityListDict[facilityList[i]]) + ("" if (len("_".join(facilityListDict[facilityList[i]])) == 0) else "_") + "\"", range(len(facilityList)))
 for i in range(len(facilityListID)):
 	row = facilityListID[i]
