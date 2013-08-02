@@ -16,7 +16,7 @@ gp.AddToolbox("C:/Program Files/ArcGIS/ArcToolbox/Toolboxes/Data Management Tool
 
 
 # Local variables...
-tmp = "C:\\working\\code\\TRAIS\\tmp1"
+tmp = "C:\\working\\code\\TRAIS\\tmp"
 TRAIS_gdb = tmp + "\\TRAIS.gdb"
 Facilities_txt = tmp + "\\Facilities.txt"
 Substances_txt = tmp + "\\Substances.txt"
