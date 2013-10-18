@@ -1,4 +1,7 @@
 *.xls
+*.zip
+input/
+output/
 json/*
 TRAIS.json
 tmp/*
