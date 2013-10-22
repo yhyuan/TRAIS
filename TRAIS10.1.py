@@ -230,7 +230,18 @@ for rownum in range(1, sh.nrows):
 	if row[0] in exitRecordDict:
 		exitRecordDict[row[0]] = exitRecordDict[row[0]] + 1
 	else:
-		exitRecordDict[row[0]] = 1			
+		exitRecordDict[row[0]] = 1
+
+	year, month, day, hour, minute, second = xlrd.xldate_as_tuple(row[21], wb.datemode)
+#	py_date = datetime.datetime(year, month, day, hour, minute, nearest_second)
+	monthStr = str(month)
+	if len(monthStr) == 1:
+		monthStr = "0" + monthStr
+	dayStr = str(day)
+	if len(dayStr) == 1:
+		dayStr = "0" + dayStr
+	# print (str(year) + "/" + str(month) + "/" + str(day))
+	row[21] = str(year) + "/" + monthStr + "/" + dayStr
 	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23]]
 	featureData.append(rowValue)
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingYear", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DateofSubmission", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Reason", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofCircumstances", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""]]
