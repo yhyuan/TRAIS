@@ -42,6 +42,7 @@ for line in fileinput.input('input\\sectorNames.txt'):
 	items = line.strip().split("\t")
 	code = int(items[0])
 	featureData.append([(0.0, 0.0), code, items[1], items[2]])
+print featureData
 featureFieldList = [["ID", "LONG", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["sectorNameEn", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["sectorNameFr", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "ID", "sectorNameEn", "sectorNameFr")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
@@ -105,57 +106,6 @@ for AnnualReportXLS in AnnualReportXLSList:
 		DisposalOnSite = calculateTotal(row, annualReportFieldIndexDict, ["LandfillDisposedOnSite", "LandTreatmentDisposedOnSite", "UndergroundInjectionDisposedOnSite", "TailingsManagementDisposedOnSite", "WasteRockManagementDisposedOnSite"])
 		DisposalOffSite = calculateTotal(row, annualReportFieldIndexDict, ["LandfillDisposedOffSite", "LandTreatmentDisposedOffSite", "UndergroundInjectionDisposedOffSite", "StorageDisposedOffSite", "PhysicalTreatmentOffSiteTransfers", "ChemicalTreatmentOffSiteTransfers", "BiologicalTreatmentOffSiteTransfers", "IncinerationThermalOffSiteTransfers", "MunicipalSewageTreatmentPlantOffsiteTransfers", "TailingsManagementDisposedOffSite", "WasteRockManagementDisposedOffSite"])
 		RecycleOffSite = calculateTotal(row, annualReportFieldIndexDict, ["EnergyRecoveryRecycledOffSite", "RecoveryofSolventsRecycledOffSite", "RecoveryofOrganicSubstancesRecycledOffSite", "RecoveryofMetalsandMetalCompoundsRecycledOffSite", "RecoveryofInorganicMaterialsRecycledOffSite", "RecoveryofAcidsandBasesRecycledOffSite", "RecoveryofCatalystsRecycledOffSite", "RecoveryofPollutionAbatementResiduesRecycledOffSite", "RefiningofReuseofUsedOilRecycledOffSite", "OtherRecycledOffSite"])
-		
-		#ID = IDDict[row[0]]
-		'''Address = row[9] + " / " + row[10]
-		NPRI_ID = 0
-		NPRI_ID = str(row[1]).strip()
-		if len(NPRI_ID) == 0:
-			NPRI_ID = None
-		else:
-			NPRI_ID = int(float(NPRI_ID))
-		 
-		if len(str(row[7]).strip()) == 0:
-			Sector = None
-			SectorDesc = ""
-		else:
-			Sector = row[7]
-			SectorDesc = ""
-			if Sector in NAICSDict:
-				SectorDesc = NAICSDict[Sector]
-			else:
-				print "Unknown Sector number"
-		Sector = str(Sector) + " - " + SectorDesc
-		
-		Contact = row[20]
-		
-		Phone  = row[22]
-		
-		Email  = row[24]
-		
-		HREmploy = row[26]
-		
-		Use = ""
-		Creation = ""
-		Contained = ""
-		ReleasestoAir = ""
-		ReleasestoWater = ""
-		ReleasestoLand = ""
-		DisposalOnSite = ""
-		DisposalOffSite = ""
-		RecycleOffSite = ""
-		
-		
-		Use = calculateTotal([row[33]])
-		Creation = calculateTotal([row[34]])
-		Contained = calculateTotal([row[35]])
-		ReleasestoAir = calculateTotal([row[37], row[38], row[39], row[40], row[41], row[42]])
-		ReleasestoWater = calculateTotal([row[43], row[44], row[45]])
-		ReleasestoLand = calculateTotal([row[46], row[47], row[48]])
-		DisposalOnSite = calculateTotal([row[49], row[50], row[51], row[52], row[53], row[54], row[55]])
-		DisposalOffSite = calculateTotal([])
-		RecycleOffSite = calculateTotal([])
-		'''
 		SubstanceName = row[30]
 		if (len(SubstanceName) > 0):
 			substanceList.append(SubstanceName)
@@ -180,6 +130,7 @@ for line in fileinput.input('input\\substance_codes.txt'):
 featureName = "SubstanceCodes"
 featureData = []
 substancesCodeDict = {}
+cntr = 1
 for substance in substanceList:
 	if cntr < 10:
 		code = "S00" + str(cntr)
@@ -198,14 +149,17 @@ for substance in substanceList:
 	if substance in substanceCASNumberDict:
 		CASNumber = substanceCASNumberDict[substance]
 	rowValue = [(0.0, 0.0), code, substance, substanceFR, CASNumber]
-	featureData.append(rowValue)	
+	featureData.append(rowValue)
+	cntr = cntr + 1
+print featureData
 featureFieldList = [["CODE", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["SUBSTANCE_EN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SUBSTANCE_FR", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CASNumber", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "CODE", "SUBSTANCE_EN", "SUBSTANCE_FR", "CASNumber")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 featureName = "PlanSummary"
 featureData = []
-wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Final.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Final.xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Amended (SAMPLE ONLY).xls')
 sh = wb.sheet_by_name(u'Data')
 planSummaryDict = {}
 for rownum in range(1, sh.nrows):
@@ -214,10 +168,10 @@ for rownum in range(1, sh.nrows):
 		planSummaryDict[row[0]] = planSummaryDict[row[0]] + 1
 	else:
 		planSummaryDict[row[0]] = 1
-	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41], row[42], row[43], row[44], row[45], row[46], row[47], row[48], row[49], row[50], row[51], row[52], row[53], row[54], row[55], row[56], row[57], row[58], row[59], row[60], row[61], row[62]]
+	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41], row[42], row[43], row[44], row[45], row[46], row[47], row[48], row[49], row[50], row[51], row[52], row[53], row[54], row[55], row[56], row[57], row[58], row[59], row[60], row[61], row[62], row[63], row[64]]
 	featureData.append(rowValue)	
-featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingPeriod", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["IntenttoReduceUseYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementofIntenttoReduceUseText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonforNoIntenttoReduceUseText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["IntenttoReduceCreationYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementofIntenttoReduceCreationText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonforNoIntenttoReduceCreationText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["PlanObjectives", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionQuantityTargetValue", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionQuantityTargetUnit", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionTimelineTargetYears", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionTargetDescription", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionQuantityTargetValue", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionQuantityTargetUnit", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionTimelineTargetYears", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionTargetDescription", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforUse", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforUseSummary", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforCreation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforCreationSummary", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementNoOptionImplementedYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsNoOptionImplemented", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["OptionReductionCategory", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ActivityTaken", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofOption", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedUseReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedCreationReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedContainedinProductReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedAirReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedAirReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedWaterReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedWaterReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedLandReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedLandReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOnsiteDisposalsReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOnsiteDisposalsReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteDisposalsReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteDisposalsReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteRecyclingReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteRecyclingReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["RationaleWhyOptionImplemented", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofAnyAdditionalActionsTaken", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["VersionofthePlan", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
-featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingPeriod", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "IntenttoReduceUseYN", "StatementofIntenttoReduceUseText", "ReasonforNoIntenttoReduceUseText", "IntenttoReduceCreationYN", "StatementofIntenttoReduceCreationText", "ReasonforNoIntenttoReduceCreationText", "PlanObjectives", "UseReductionQuantityTargetValue", "UseReductionQuantityTargetUnit", "UseReductionTimelineTargetYears", "UseReductionTargetDescription", "CreationReductionQuantityTargetValue", "CreationReductionQuantityTargetUnit", "CreationReductionTimelineTargetYears", "CreationReductionTargetDescription", "ReasonsforUse", "ReasonsforUseSummary", "ReasonsforCreation", "ReasonsforCreationSummary", "StatementNoOptionImplementedYN", "ReasonsNoOptionImplemented", "OptionReductionCategory", "ActivityTaken", "DescriptionofOption", "EstimatedUseReductionPercent", "EstimatedCreationReductionPercent", "EstimatedContainedinProductReductionPercent", "EstimatedAirReleasesReduction", "EstimatedAirReleasesReductionPercent", "EstimatedWaterReleasesReduction", "EstimatedWaterReleasesReductionPercent", "EstimatedLandReleasesReduction", "EstimatedLandReleasesReductionPercent", "EstimatedOnsiteDisposalsReduction", "EstimatedOnsiteDisposalsReductionPercent", "EstimatedOffsiteDisposalsReduction", "EstimatedOffsiteDisposalsReductionPercent", "EstimatedOffsiteRecyclingReduction", "EstimatedOffsiteRecyclingReductionPercent", "RationaleWhyOptionImplemented", "DescriptionofAnyAdditionalActionsTaken", "VersionofthePlan")
+featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingPeriod", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["IntenttoReduceUseYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementofIntenttoReduceUseText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonforNoIntenttoReduceUseText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["IntenttoReduceCreationYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementofIntenttoReduceCreationText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonforNoIntenttoReduceCreationText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["PlanObjectives", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionQuantityTargetValue", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionQuantityTargetUnit", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionTimelineTargetYears", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionTargetDescription", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionQuantityTargetValue", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionQuantityTargetUnit", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionTimelineTargetYears", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionTargetDescription", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforUse", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforUseSummary", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforCreation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforCreationSummary", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementNoOptionImplementedYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsNoOptionImplemented", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["OptionReductionCategory", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ActivityTaken", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofOption", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedUseReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedCreationReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedContainedinProductReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedAirReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedAirReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedWaterReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedWaterReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedLandReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedLandReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOnsiteDisposalsReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOnsiteDisposalsReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteDisposalsReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteDisposalsReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteRecyclingReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteRecyclingReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["AnticipatedTimelinesforAchievingReductionsinUse", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["AnticipatedTimelinesforAchievingReductionsinCreation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["RationaleWhyOptionImplemented", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofAnyAdditionalActionsTaken", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["VersionofthePlan", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingPeriod", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "IntenttoReduceUseYN", "StatementofIntenttoReduceUseText", "ReasonforNoIntenttoReduceUseText", "IntenttoReduceCreationYN", "StatementofIntenttoReduceCreationText", "ReasonforNoIntenttoReduceCreationText", "PlanObjectives", "UseReductionQuantityTargetValue", "UseReductionQuantityTargetUnit", "UseReductionTimelineTargetYears", "UseReductionTargetDescription", "CreationReductionQuantityTargetValue", "CreationReductionQuantityTargetUnit", "CreationReductionTimelineTargetYears", "CreationReductionTargetDescription", "ReasonsforUse", "ReasonsforUseSummary", "ReasonsforCreation", "ReasonsforCreationSummary", "StatementNoOptionImplementedYN", "ReasonsNoOptionImplemented", "OptionReductionCategory", "ActivityTaken", "DescriptionofOption", "EstimatedUseReductionPercent", "EstimatedCreationReductionPercent", "EstimatedContainedinProductReductionPercent", "EstimatedAirReleasesReduction", "EstimatedAirReleasesReductionPercent", "EstimatedWaterReleasesReduction", "EstimatedWaterReleasesReductionPercent", "EstimatedLandReleasesReduction", "EstimatedLandReleasesReductionPercent", "EstimatedOnsiteDisposalsReduction", "EstimatedOnsiteDisposalsReductionPercent", "EstimatedOffsiteDisposalsReduction", "EstimatedOffsiteDisposalsReductionPercent", "EstimatedOffsiteRecyclingReduction", "EstimatedOffsiteRecyclingReductionPercent", "AnticipatedTimelinesforAchievingReductionsinUse", "AnticipatedTimelinesforAchievingReductionsinCreation", "RationaleWhyOptionImplemented", "DescriptionofAnyAdditionalActionsTaken", "VersionofthePlan")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 featureName = "ExitRecords"
@@ -247,6 +201,34 @@ for rownum in range(1, sh.nrows):
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingYear", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DateofSubmission", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Reason", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofCircumstances", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingYear", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "DateofSubmission", "Reason", "DescriptionofCircumstances")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
+
+featureName = "ExemptionRecords"
+featureData = []
+wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20130815 - V2 (SAMPLE ONLY).xls')
+sh = wb.sheet_by_name(u'Data')
+exemptionRecordDict = {}
+for rownum in range(1, sh.nrows):
+	row = sh.row_values(rownum)
+	if row[0] in exitRecordDict:
+		exemptionRecordDict[row[0]] = exemptionRecordDict[row[0]] + 1
+	else:
+		exemptionRecordDict[row[0]] = 1
+
+	year, month, day, hour, minute, second = xlrd.xldate_as_tuple(row[21], wb.datemode)
+	monthStr = str(month)
+	if len(monthStr) == 1:
+		monthStr = "0" + monthStr
+	dayStr = str(day)
+	if len(dayStr) == 1:
+		dayStr = "0" + dayStr
+	# print (str(year) + "/" + str(month) + "/" + str(day))
+	row[21] = str(year) + "/" + monthStr + "/" + dayStr
+	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24]]
+	featureData.append(rowValue)
+featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingPeriod", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DateofSubmission", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ApplicableArea", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofCircumstances", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["RecordRank", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingPeriod", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "DateofSubmission", "ApplicableArea", "DescriptionofCircumstances", "RecordRank")
+createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
+
 
 substanceListDict = {}
 wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2010 - 20130815 - Final.xls')
@@ -312,9 +294,11 @@ for rownum in range(1, sh.nrows):
 	NUMPlanSummary = 0
 	if row[0] in planSummaryDict:
 		NUMPlanSummary = planSummaryDict[row[0]]
-	NUMExitRecord = 0
+	NUMRecord = 0
 	if row[0] in exitRecordDict:
-		NUMExitRecord = exitRecordDict[row[0]]
+		NUMRecord = exitRecordDict[row[0]]
+	if row[0] in exemptionRecordDict:
+		NUMRecord = exemptionRecordDict[row[0]] + NUMRecord
 
 	if len(str(row[14]).strip()) == 0:
 		row[14] = 0.0
@@ -324,10 +308,10 @@ for rownum in range(1, sh.nrows):
 		row[5] = None
 	if row[14] > 0:
 		row[14] = -row[14]
-	rowValue = [(row[14], row[13]), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], NPRI_ID, Sector, SectorDesc, NUMsubst, Substance_List, NUMPlanSummary, NUMExitRecord]
+	rowValue = [(row[14], row[13]), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], NPRI_ID, Sector, SectorDesc, NUMsubst, Substance_List, NUMPlanSummary, NUMRecord]
 	featureData.append(rowValue)
-featureFieldList = [["UniqueID", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["NPRIId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MOEId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Organisation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Facility", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Year", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["City", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCode", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Latitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Longitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofSubstances", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceDataset", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceXMLID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRI_ID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Sector", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SectorDesc", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMsubst", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Substance_List", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMPlanSummary", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMExitRecord", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
-featureInsertCursorFields = ("SHAPE@XY", "UniqueID", "NPRIId", "MOEId", "Organisation", "Facility", "NAICS", "Year", "StreetAddress", "City", "PostalCode", "UTMZone", "UTMEasting", "UTMNorthing", "Latitude", "Longitude", "NumberofSubstances", "SourceDataset", "SourceXMLID", "NPRI_ID", "Sector", "SectorDesc", "NUMsubst", "Substance_List", "NUMPlanSummary", "NUMExitRecord")
+featureFieldList = [["UniqueID", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["NPRIId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MOEId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Organisation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Facility", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Year", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["City", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCode", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Latitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Longitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofSubstances", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceDataset", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceXMLID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRI_ID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Sector", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SectorDesc", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMsubst", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Substance_List", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMPlanSummary", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMRecord", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureInsertCursorFields = ("SHAPE@XY", "UniqueID", "NPRIId", "MOEId", "Organisation", "Facility", "NAICS", "Year", "StreetAddress", "City", "PostalCode", "UTMZone", "UTMEasting", "UTMNorthing", "Latitude", "Longitude", "NumberofSubstances", "SourceDataset", "SourceXMLID", "NPRI_ID", "Sector", "SectorDesc", "NUMsubst", "Substance_List", "NUMPlanSummary", "NUMRecord")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 elapsed_time = time.time() - start_time
