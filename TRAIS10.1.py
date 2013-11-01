@@ -42,7 +42,7 @@ for line in fileinput.input('input\\sectorNames.txt'):
 	items = line.strip().split("\t")
 	code = int(items[0])
 	featureData.append([(0.0, 0.0), code, items[1], items[2]])
-print featureData
+#print featureData
 featureFieldList = [["ID", "LONG", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["sectorNameEn", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["sectorNameFr", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "ID", "sectorNameEn", "sectorNameFr")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
@@ -151,7 +151,7 @@ for substance in substanceList:
 	rowValue = [(0.0, 0.0), code, substance, substanceFR, CASNumber]
 	featureData.append(rowValue)
 	cntr = cntr + 1
-print featureData
+#print featureData
 featureFieldList = [["CODE", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["SUBSTANCE_EN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SUBSTANCE_FR", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CASNumber", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "CODE", "SUBSTANCE_EN", "SUBSTANCE_FR", "CASNumber")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
@@ -262,7 +262,10 @@ for rownum in range(1, sh.nrows):
 
 featureName = "Facilities"
 featureData = []
-wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2010 and 2011 (M) - 20130815 - Final.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2010 and 2011 (M) - 20130815 - Final.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft.xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft 2.xls')
+
 sh = wb.sheet_by_name(u'Main')
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
@@ -308,10 +311,10 @@ for rownum in range(1, sh.nrows):
 		row[5] = None
 	if row[14] > 0:
 		row[14] = -row[14]
-	rowValue = [(row[14], row[13]), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], NPRI_ID, Sector, SectorDesc, NUMsubst, Substance_List, NUMPlanSummary, NUMRecord]
+	rowValue = [(row[14], row[13]), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], NPRI_ID, Sector, SectorDesc, NUMsubst, Substance_List, NUMPlanSummary, NUMRecord]
 	featureData.append(rowValue)
-featureFieldList = [["UniqueID", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["NPRIId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MOEId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Organisation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Facility", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Year", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["City", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCode", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Latitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Longitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofSubstances", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceDataset", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceXMLID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRI_ID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Sector", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SectorDesc", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMsubst", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Substance_List", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMPlanSummary", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMRecord", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
-featureInsertCursorFields = ("SHAPE@XY", "UniqueID", "NPRIId", "MOEId", "Organisation", "Facility", "NAICS", "Year", "StreetAddress", "City", "PostalCode", "UTMZone", "UTMEasting", "UTMNorthing", "Latitude", "Longitude", "NumberofSubstances", "SourceDataset", "SourceXMLID", "NPRI_ID", "Sector", "SectorDesc", "NUMsubst", "Substance_List", "NUMPlanSummary", "NUMRecord")
+featureFieldList = [["UniqueID", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["NPRIId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MOEId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Organisation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Facility", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Year", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["City", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCode", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Latitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Longitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceDataset", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceXMLID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRI_ID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Sector", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SectorDesc", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMsubst", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Substance_List", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMPlanSummary", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMRecord", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureInsertCursorFields = ("SHAPE@XY", "UniqueID", "NPRIId", "MOEId", "Organisation", "Facility", "NAICS", "Year", "StreetAddress", "City", "PostalCode", "UTMZone", "UTMEasting", "UTMNorthing", "Latitude", "Longitude", "SourceDataset", "SourceXMLID", "NPRI_ID", "Sector", "SectorDesc", "NUMsubst", "Substance_List", "NUMPlanSummary", "NUMRecord")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 elapsed_time = time.time() - start_time
