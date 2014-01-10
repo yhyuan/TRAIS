@@ -24,6 +24,7 @@ def createFeatureClass(featureName, featureData, featureFieldList, featureInsert
 	# Process: Add Fields	
 	for featrueField in featureFieldList:
 		arcpy.AddField_management(featureNameNAD83Path, featrueField[0], featrueField[1], featrueField[2], featrueField[3], featrueField[4], featrueField[5], featrueField[6], featrueField[7], featrueField[8])
+	# Process: Append the records
 	cntr = 1
 	try:
 		with arcpy.da.InsertCursor(featureNameNAD83, featureInsertCursorFields) as cur:
@@ -32,6 +33,7 @@ def createFeatureClass(featureName, featureData, featureFieldList, featureInsert
 				cntr = cntr + 1
 	except Exception as e:
 		print "\tError: " + featureName + ": " + e.message
+	# Change the projection to web mercator
 	arcpy.Project_management(featureNameNAD83Path, arcpy.env.workspace + "\\" + featureName, "PROJCS['WGS_1984_Web_Mercator_Auxiliary_Sphere',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Mercator_Auxiliary_Sphere'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],PARAMETER['Auxiliary_Sphere_Type',0.0],UNIT['Meter',1.0]]", "NAD_1983_To_WGS_1984_5", "GEOGCS['GCS_North_American_1983',DATUM['D_North_American_1983',SPHEROID['GRS_1980',6378137.0,298.257222101]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]]")
 	arcpy.Delete_management(featureNameNAD83Path, "FeatureClass")
 	print "Finish " + featureName + " feature class."
@@ -42,6 +44,7 @@ for line in fileinput.input('input\\sectorNames.txt'):
 	items = line.strip().split("\t")
 	code = int(items[0])
 	featureData.append([(0.0, 0.0), code, items[1], items[2]])
+#print featureData
 #print featureData
 featureFieldList = [["ID", "LONG", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["sectorNameEn", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["sectorNameFr", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "ID", "sectorNameEn", "sectorNameFr")
@@ -80,8 +83,12 @@ featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NON_NULLABLE",
 annualReportFieldIndexDict[0] = "UniqueFacilityID"
 index = 1
 fieldList = ["NPRIID", "ReportingPeriod", "OrganizationName", "FacilityName", "RelationshipType", "MOEREG127Number", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "CountryPhysicalAddress", "AdditionalInformationPhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "Latitude", "Longitude", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactFaxNumber", "PublicContactEmail", "PublicContactLanguageCorrespondence", "HighestRankingEmployee", "ParentLegalName", "ParentBusinessNumber", "ParentPercentageOwned", "SubstanceName", "CASNumber", "Units", "EnteredtheFacilityUsed", "Created", "ContainedinProduct", "ReportSumofAllMedia", "StackorPointReleasestoAir", "StorageorHandlingReleasestoAir", "FugitiveReleasestoAir", "SpillsReleasestoAir", "OtherNonPointReleasestoAir", "OtherReleasestoAir", "DirectDischargesReleasestoWater", "SpillsReleasestoWater", "LeaksReleasestoWater", "SpillsReleasestoLand", "LeaksReleasestoLand", "OtherReleasestoLand", "LandfillDisposedOnSite", "LandTreatmentDisposedOnSite", "UndergroundInjectionDisposedOnSite", "LandfillDisposedOffSite", "LandTreatmentDisposedOffSite", "UndergroundInjectionDisposedOffSite", "StorageDisposedOffSite", "PhysicalTreatmentOffSiteTransfers", "ChemicalTreatmentOffSiteTransfers", "BiologicalTreatmentOffSiteTransfers", "IncinerationThermalOffSiteTransfers", "MunicipalSewageTreatmentPlantOffsiteTransfers", "TailingsManagementDisposedOnSite", "WasteRockManagementDisposedOnSite", "TailingsManagementDisposedOffSite", "WasteRockManagementDisposedOffSite", "EnergyRecoveryRecycledOffSite", "RecoveryofSolventsRecycledOffSite", "RecoveryofOrganicSubstancesRecycledOffSite", "RecoveryofMetalsandMetalCompoundsRecycledOffSite", "RecoveryofInorganicMaterialsRecycledOffSite", "RecoveryofAcidsandBasesRecycledOffSite", "RecoveryofCatalystsRecycledOffSite", "RecoveryofPollutionAbatementResiduesRecycledOffSite", "RefiningofReuseofUsedOilRecycledOffSite", "OtherRecycledOffSite", "UseEnteredtheFacilityAnnualPercentageChange", "UseReportingPeriodofLastReportedQuantity", "CreatedAnnualPercentageChange", "CreatedReportingPeriodofLastReportedQuantity", "ContainedinProductAnnualPercentageChange", "ContainedinProductReportingPeriodofLastReportedQuantity", "ReasonsforChangeTRAQuantifications", "AllMediaAnnualPercentageChange", "AllMediaReportingPeriodofLastReportedQuantity", "ReleasestoAirAnnualPercentageChange", "ReleasestoAirReportingPeriodofLastReportedQuantity", "ReleasestoWaterAnnualPercentageChange", "ReleasestoWaterReportingPeriodofLastReportedQuantity", "ReleasestoLandAnnualPercentageChange", "ReleasestoLandReportingPeriodofLastReportedQuantity", "ReasonsforChangeAllMedia", "DisposedOnSiteAnnualPercentageChange", "DisposedOnSiteReportingPeriodofLastReportedQuantity", "DisposedOffSiteAnnualPercentageChange", "DisposedOffSiteReportingPeriodofLastReportedQuantity", "OffSiteTransfersAnnualPercentageChange", "OffSiteTransfersReportingPeriodofLastReportedQuantity", "ReasonsforChangeDisposals", "RecycledOffSiteAnnualPercentageChange", "RecycledReportingPeriodofLastReportedQuantity", "ReasonsForChangeRecycling", "PlanObjectives", "UseReductionTargetQuantity", "UseReductionTargetUnits", "UseReductionTargetTimeline", "UseDescriptionofTargets", "CreationReductionTargetQuantity", "CreationReductionTargetUnits", "CreationReductionTargetTimeline", "CreationDescriptionofTargets", "NoOptionsIdentifiedforUseorCreation", "Option", "ToxicsReductionCategory", "OptionActivityTaken", "Descriptionofreductionstepstaken", "Comparisonofthesteps", "OptionsImplementedAmountofreductioninuse", "OptionsImplementedAmountofreductionincreation", "OptionsImplementedAmountofreductionincontainedinproduct", "OptionsImplementedAmountofreductioninreleasetoair", "OptionsImplementedAmountofreductioninreleasetowater", "OptionsImplementedAmountofreductioninreleasetoland", "OptionsImplementedAmountofreductionindisposedonsite", "OptionsImplementedAmountofreductioninthesubstancedisposedoffsite", "OptionsImplementedAmountofreductioninrecycled", "Willthetimelinesbemet", "Comments", "DescriptionofAdditionalAction", "AdditionalActionsAmountofreductioninuse", "AdditionalActionsAmountofreductionincreation", "AdditionalActionsAmountofreductionincontainedinproduct", "AdditionalActionsAmountofreductioninreleasetoair", "AdditionalActionsAmountofreductioninreleasetowater", "AdditionalActionsAmountofreductioninreleasetoland", "AdditionalActionsAmountofreductionindisposedonsite", "AdditionalActionsAmountofreductioninthesubstancedisposedoffsite", "AdditionalActionsAmountofreductioninrecycled", "AmendmentsDescription", "DisposedOnSiteAnnualPercentageChangeHTMLOnly", "DisposedOffSiteAnnualPercentageChangeHTMLOnly"]
+longTextFieldList = ["PlanObjectives", "Descriptionofreductionstepstaken", "DescriptionofAdditionalAction", "Comparisonofthesteps", "Comments", "AmendmentsDescription"]
 for field in fieldList:
-	featureFieldList.append([field, "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""])
+	if (field in longTextFieldList):
+		featureFieldList.append([field, "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""])
+	else:
+		featureFieldList.append([field, "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""])
 	annualReportFieldIndexDict[field] = index
 	index = index + 1
 
@@ -94,8 +101,10 @@ featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "Reportin
 featureData = []
 substanceList = []
 substanceCASNumberDict = {}
-AnnualReportXLSList = ['TRA - Annual Report - 2010 - 20130815 - Amended.xls', 'TRA - Annual Report - 2011 - 20130815 - Amended.xls']
+#AnnualReportXLSList = ['TRA - Annual Report - 2010 - 20130815 - Amended.xls', 'TRA - Annual Report - 2011 - 20130815 - Amended.xls']
+AnnualReportXLSList = ['TRA - Annual Report - 2010 - 20131220 - Final.xls', 'TRA - Annual Report - 2011 - 20131220 - Final.xls', 'TRA - Annual Report - 2012 - 20131220 - Final.xls']
 for AnnualReportXLS in AnnualReportXLSList:
+	#print "Process: " + AnnualReportXLS
 	wb = xlrd.open_workbook('input\\Data\\' + AnnualReportXLS)
 	sh = wb.sheet_by_name(u'Data')
 	for rownum in range(1, sh.nrows):
@@ -159,7 +168,8 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 featureName = "PlanSummary"
 featureData = []
 #wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Final.xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Amended (SAMPLE ONLY).xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Amended (SAMPLE ONLY).xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20131220 - Final.xls')
 sh = wb.sheet_by_name(u'Data')
 planSummaryDict = {}
 for rownum in range(1, sh.nrows):
@@ -176,9 +186,32 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 
 featureName = "ExitRecords"
 featureData = []
-wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2011 - 20130815 - Final.xls')
-sh = wb.sheet_by_name(u'Data')
 exitRecordDict = {}
+
+#wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2011 - 20130815 - Final.xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2011 - 20131220 - Final.xls')
+sh = wb.sheet_by_name(u'Data')
+for rownum in range(1, sh.nrows):
+	row = sh.row_values(rownum)
+	if row[0] in exitRecordDict:
+		exitRecordDict[row[0]] = exitRecordDict[row[0]] + 1
+	else:
+		exitRecordDict[row[0]] = 1
+
+	year, month, day, hour, minute, second = xlrd.xldate_as_tuple(row[21], wb.datemode)
+#	py_date = datetime.datetime(year, month, day, hour, minute, nearest_second)
+	monthStr = str(month)
+	if len(monthStr) == 1:
+		monthStr = "0" + monthStr
+	dayStr = str(day)
+	if len(dayStr) == 1:
+		dayStr = "0" + dayStr
+	# print (str(year) + "/" + str(month) + "/" + str(day))
+	row[21] = str(year) + "/" + monthStr + "/" + dayStr
+	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23]]
+	featureData.append(rowValue)
+wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2012 - 20131220 - Final.xls')
+sh = wb.sheet_by_name(u'Data')
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
 	if row[0] in exitRecordDict:
@@ -204,12 +237,15 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 
 featureName = "ExemptionRecords"
 featureData = []
-wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20130815 - V2 (SAMPLE ONLY).xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20130815 - V2 (SAMPLE ONLY).xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20131220 - Final.xlsx')
 sh = wb.sheet_by_name(u'Data')
 exemptionRecordDict = {}
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
-	if row[0] in exitRecordDict:
+	#print rownum
+	#print row
+	if row[0] in exemptionRecordDict:
 		exemptionRecordDict[row[0]] = exemptionRecordDict[row[0]] + 1
 	else:
 		exemptionRecordDict[row[0]] = 1
@@ -231,7 +267,8 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 
 
 substanceListDict = {}
-wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2010 - 20130815 - Final.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2010 - 20130815 - Final.xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2010 - 20131220 - Final.xls')
 sh = wb.sheet_by_name(u'Data')
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
@@ -245,7 +282,22 @@ for rownum in range(1, sh.nrows):
 			substanceListDict[UniqueFacilityID].append(code)
 	else:
 		substanceListDict[UniqueFacilityID] = [code]
-wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2011 - 20130815 - Final.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2011 - 20130815 - Final.xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2011 - 20131220 - Final.xls')
+sh = wb.sheet_by_name(u'Data')
+for rownum in range(1, sh.nrows):
+	row = sh.row_values(rownum)
+	SubstanceName = row[30]
+	if (len(SubstanceName) == 0):
+		continue
+	code = substancesCodeDict[SubstanceName]
+	UniqueFacilityID = row[0]
+	if UniqueFacilityID in substanceListDict:
+		if not (code in substanceListDict[UniqueFacilityID]): 
+			substanceListDict[UniqueFacilityID].append(code)
+	else:
+		substanceListDict[UniqueFacilityID] = [code]
+wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2012 - 20131220 - Final.xls')
 sh = wb.sheet_by_name(u'Data')
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
@@ -264,11 +316,15 @@ featureName = "Facilities"
 featureData = []
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2010 and 2011 (M) - 20130815 - Final.xls')
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft.xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft 2.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft 2.xls')
+#wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20131220 - Draft 1.xls')
+wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20131220 - Final.xls')
 
 sh = wb.sheet_by_name(u'Main')
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
+	#print rownum
+	#print row
 	NPRI_ID = str(row[1]).strip()
 	if isinstance(row[1], float):
 		NPRI_ID = str(int(row[1])).strip()
