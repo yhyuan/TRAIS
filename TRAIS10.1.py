@@ -6,6 +6,12 @@ import xlrd, arcpy, string, os, zipfile, fileinput, time
 from datetime import date
 start_time = time.time()
 
+AnnualReportXLSList = ['TRA - Annual Report - 2010 - 20131220 - Final.xls', 'TRA - Annual Report - 2011 - 20131220 - Final.xls', 'TRA - Annual Report - 2012 - 20131220 - Final.xls']
+planSummaryXLS = "TRA - Plan Summary - 2011 - 20131220 - Final.xls"
+ExitRecordsXLSList = ["TRA - Exit Records - 2011 - 20131220 - Final.xls", "TRA - Exit Records - 2012 - 20131220 - Final.xls"]
+ExemptionRecordsXLS = "TRA - Exemption Records - 2012 - 20131220 - Final.xlsx"
+FacilityTableXLS = 'TRA - Facility Table - 2012 - 20131220 - Final.xls'
+
 INPUT_PATH = "input"
 OUTPUT_PATH = "output"
 if arcpy.Exists(OUTPUT_PATH + "\\TRAIS.gdb"):
@@ -72,6 +78,10 @@ def parseNumber(item):
 		return item	
 
 def calculateTotal(row, annualReportFieldIndexDict, fields):
+	# if all the fields are empty, return an empty as their sum. 
+	filterFields = filter(lambda field: ((type(row[annualReportFieldIndexDict[field]]) is unicode or type(row[annualReportFieldIndexDict[field]]) is str) and len(row[annualReportFieldIndexDict[field]]) == 0), fields)
+	if len(filterFields) == len(fields):
+		return ""
 	total = 0
 	for field in fields:
 		total = total + parseNumber(row[annualReportFieldIndexDict[field]])
@@ -101,8 +111,6 @@ featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "Reportin
 featureData = []
 substanceList = []
 substanceCASNumberDict = {}
-#AnnualReportXLSList = ['TRA - Annual Report - 2010 - 20130815 - Amended.xls', 'TRA - Annual Report - 2011 - 20130815 - Amended.xls']
-AnnualReportXLSList = ['TRA - Annual Report - 2010 - 20131220 - Final.xls', 'TRA - Annual Report - 2011 - 20131220 - Final.xls', 'TRA - Annual Report - 2012 - 20131220 - Final.xls']
 for AnnualReportXLS in AnnualReportXLSList:
 	#print "Process: " + AnnualReportXLS
 	wb = xlrd.open_workbook('input\\Data\\' + AnnualReportXLS)
@@ -169,7 +177,8 @@ featureName = "PlanSummary"
 featureData = []
 #wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Final.xls')
 #wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Amended (SAMPLE ONLY).xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20131220 - Final.xls')
+
+wb = xlrd.open_workbook('input\\Data\\' + planSummaryXLS)
 sh = wb.sheet_by_name(u'Data')
 planSummaryDict = {}
 for rownum in range(1, sh.nrows):
@@ -187,50 +196,26 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 featureName = "ExitRecords"
 featureData = []
 exitRecordDict = {}
+for ExitRecordsXLS in ExitRecordsXLSList:
+	wb = xlrd.open_workbook('input\\Data\\' + ExitRecordsXLS)
+	sh = wb.sheet_by_name(u'Data')
+	for rownum in range(1, sh.nrows):
+		row = sh.row_values(rownum)
+		if row[0] in exitRecordDict:
+			exitRecordDict[row[0]] = exitRecordDict[row[0]] + 1
+		else:
+			exitRecordDict[row[0]] = 1
 
-#wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2011 - 20130815 - Final.xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2011 - 20131220 - Final.xls')
-sh = wb.sheet_by_name(u'Data')
-for rownum in range(1, sh.nrows):
-	row = sh.row_values(rownum)
-	if row[0] in exitRecordDict:
-		exitRecordDict[row[0]] = exitRecordDict[row[0]] + 1
-	else:
-		exitRecordDict[row[0]] = 1
-
-	year, month, day, hour, minute, second = xlrd.xldate_as_tuple(row[21], wb.datemode)
-#	py_date = datetime.datetime(year, month, day, hour, minute, nearest_second)
-	monthStr = str(month)
-	if len(monthStr) == 1:
-		monthStr = "0" + monthStr
-	dayStr = str(day)
-	if len(dayStr) == 1:
-		dayStr = "0" + dayStr
-	# print (str(year) + "/" + str(month) + "/" + str(day))
-	row[21] = str(year) + "/" + monthStr + "/" + dayStr
-	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23]]
-	featureData.append(rowValue)
-wb = xlrd.open_workbook('input\\Data\\TRA - Exit Records - 2012 - 20131220 - Final.xls')
-sh = wb.sheet_by_name(u'Data')
-for rownum in range(1, sh.nrows):
-	row = sh.row_values(rownum)
-	if row[0] in exitRecordDict:
-		exitRecordDict[row[0]] = exitRecordDict[row[0]] + 1
-	else:
-		exitRecordDict[row[0]] = 1
-
-	year, month, day, hour, minute, second = xlrd.xldate_as_tuple(row[21], wb.datemode)
-#	py_date = datetime.datetime(year, month, day, hour, minute, nearest_second)
-	monthStr = str(month)
-	if len(monthStr) == 1:
-		monthStr = "0" + monthStr
-	dayStr = str(day)
-	if len(dayStr) == 1:
-		dayStr = "0" + dayStr
-	# print (str(year) + "/" + str(month) + "/" + str(day))
-	row[21] = str(year) + "/" + monthStr + "/" + dayStr
-	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23]]
-	featureData.append(rowValue)
+		year, month, day, hour, minute, second = xlrd.xldate_as_tuple(row[21], wb.datemode)
+		monthStr = str(month)
+		if len(monthStr) == 1:
+			monthStr = "0" + monthStr
+		dayStr = str(day)
+		if len(dayStr) == 1:
+			dayStr = "0" + dayStr
+		row[21] = str(year) + "/" + monthStr + "/" + dayStr
+		rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23]]
+		featureData.append(rowValue)
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingYear", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DateofSubmission", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Reason", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofCircumstances", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingYear", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "DateofSubmission", "Reason", "DescriptionofCircumstances")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
@@ -238,13 +223,11 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 featureName = "ExemptionRecords"
 featureData = []
 #wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20130815 - V2 (SAMPLE ONLY).xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20131220 - Final.xlsx')
+wb = xlrd.open_workbook('input\\Data\\' + ExemptionRecordsXLS)
 sh = wb.sheet_by_name(u'Data')
 exemptionRecordDict = {}
 for rownum in range(1, sh.nrows):
 	row = sh.row_values(rownum)
-	#print rownum
-	#print row
 	if row[0] in exemptionRecordDict:
 		exemptionRecordDict[row[0]] = exemptionRecordDict[row[0]] + 1
 	else:
@@ -257,7 +240,6 @@ for rownum in range(1, sh.nrows):
 	dayStr = str(day)
 	if len(dayStr) == 1:
 		dayStr = "0" + dayStr
-	# print (str(year) + "/" + str(month) + "/" + str(day))
 	row[21] = str(year) + "/" + monthStr + "/" + dayStr
 	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24]]
 	featureData.append(rowValue)
@@ -267,58 +249,30 @@ createFeatureClass(featureName, featureData, featureFieldList, featureInsertCurs
 
 
 substanceListDict = {}
-#wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2010 - 20130815 - Final.xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2010 - 20131220 - Final.xls')
-sh = wb.sheet_by_name(u'Data')
-for rownum in range(1, sh.nrows):
-	row = sh.row_values(rownum)
-	SubstanceName = row[30]
-	if (len(SubstanceName) == 0):
-		continue
-	code = substancesCodeDict[SubstanceName]
-	UniqueFacilityID = row[0]
-	if UniqueFacilityID in substanceListDict:
-		if not (code in substanceListDict[UniqueFacilityID]): 
-			substanceListDict[UniqueFacilityID].append(code)
-	else:
-		substanceListDict[UniqueFacilityID] = [code]
-#wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2011 - 20130815 - Final.xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2011 - 20131220 - Final.xls')
-sh = wb.sheet_by_name(u'Data')
-for rownum in range(1, sh.nrows):
-	row = sh.row_values(rownum)
-	SubstanceName = row[30]
-	if (len(SubstanceName) == 0):
-		continue
-	code = substancesCodeDict[SubstanceName]
-	UniqueFacilityID = row[0]
-	if UniqueFacilityID in substanceListDict:
-		if not (code in substanceListDict[UniqueFacilityID]): 
-			substanceListDict[UniqueFacilityID].append(code)
-	else:
-		substanceListDict[UniqueFacilityID] = [code]
-wb = xlrd.open_workbook('input\\Data\\TRA - Annual Report - 2012 - 20131220 - Final.xls')
-sh = wb.sheet_by_name(u'Data')
-for rownum in range(1, sh.nrows):
-	row = sh.row_values(rownum)
-	SubstanceName = row[30]
-	if (len(SubstanceName) == 0):
-		continue
-	code = substancesCodeDict[SubstanceName]
-	UniqueFacilityID = row[0]
-	if UniqueFacilityID in substanceListDict:
-		if not (code in substanceListDict[UniqueFacilityID]): 
-			substanceListDict[UniqueFacilityID].append(code)
-	else:
-		substanceListDict[UniqueFacilityID] = [code]
+for AnnualReportXLS in AnnualReportXLSList:
+	wb = xlrd.open_workbook('input\\Data\\' + AnnualReportXLS)
+	sh = wb.sheet_by_name(u'Data')
+	for rownum in range(1, sh.nrows):
+		row = sh.row_values(rownum)
+		SubstanceName = row[30]
+		if (len(SubstanceName) == 0):
+			continue
+		code = substancesCodeDict[SubstanceName]
+		UniqueFacilityID = row[0]
+		if UniqueFacilityID in substanceListDict:
+			if not (code in substanceListDict[UniqueFacilityID]): 
+				substanceListDict[UniqueFacilityID].append(code)
+		else:
+			substanceListDict[UniqueFacilityID] = [code]
 
 featureName = "Facilities"
 featureData = []
+
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2010 and 2011 (M) - 20130815 - Final.xls')
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft.xls')
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20130815 - Draft 2.xls')
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20131220 - Draft 1.xls')
-wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2012 - 20131220 - Final.xls')
+wb = xlrd.open_workbook('input\\Data\\' + FacilityTableXLS)
 
 sh = wb.sheet_by_name(u'Main')
 for rownum in range(1, sh.nrows):
