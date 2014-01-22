@@ -117,7 +117,7 @@ for AnnualReportXLS in AnnualReportXLSList:
 	sh = wb.sheet_by_name(u'Data')
 	for rownum in range(1, sh.nrows):
 		row = sh.row_values(rownum)
-		ReleasestoAir = calculateTotal(row, annualReportFieldIndexDict, ["StackorPointReleasestoAir", "StorageorHandlingReleasestoAir", "FugitiveReleasestoAir", "SpillsReleasestoAir", "OtherNonPointReleasestoAir"])
+		ReleasestoAir = calculateTotal(row, annualReportFieldIndexDict, ["StackorPointReleasestoAir", "StorageorHandlingReleasestoAir", "FugitiveReleasestoAir", "SpillsReleasestoAir", "OtherNonPointReleasestoAir", "OtherReleasestoAir"])
 		ReleasestoWater = calculateTotal(row, annualReportFieldIndexDict, ["DirectDischargesReleasestoWater", "SpillsReleasestoWater", "LeaksReleasestoWater"])
 		ReleasestoLand = calculateTotal(row, annualReportFieldIndexDict, ["SpillsReleasestoLand", "LeaksReleasestoLand", "OtherReleasestoLand"])
 		DisposalOnSite = calculateTotal(row, annualReportFieldIndexDict, ["LandfillDisposedOnSite", "LandTreatmentDisposedOnSite", "UndergroundInjectionDisposedOnSite", "TailingsManagementDisposedOnSite", "WasteRockManagementDisposedOnSite"])
