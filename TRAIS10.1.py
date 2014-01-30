@@ -131,7 +131,78 @@ for AnnualReportXLS in AnnualReportXLSList:
 		rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41], row[42], row[43], row[44], row[45], row[46], row[47], row[48], row[49], row[50], row[51], row[52], row[53], row[54], row[55], row[56], row[57], row[58], row[59], row[60], row[61], row[62], row[63], row[64], row[65], row[66], row[67], row[68], row[69], row[70], row[71], row[72], row[73], row[74], row[75], row[76], row[77], row[78], row[79], row[80], row[81], row[82], row[83], row[84], row[85], row[86], row[87], row[88], row[89], row[90], row[91], row[92], row[93], row[94], row[95], row[96], row[97], row[98], row[99], row[100], row[101], row[102], row[103], row[104], row[105], row[106], row[107], row[108], row[109], row[110], row[111], row[112], row[113], row[114], row[115], row[116], row[117], row[118], row[119], row[120], row[121], row[122], row[123], row[124], row[125], row[126], row[127], row[128], row[129], row[130], row[131], row[132], row[133], row[134], row[135], row[136], row[137], row[138], row[139]]
 		rowValue = rowValue + [ReleasestoAir, ReleasestoWater, ReleasestoLand, DisposalOnSite, DisposalOffSite, RecycleOffSite]
 		featureData.append(rowValue)
-
+nameChangeFieldsDict = {
+	"MunicipalityCityPhysicalAddress": "MunicipalityCityPhysicalAddres",
+	"AdditionalInformationPhysicalAddress": "AdditionalInfoPhysicalAddress",
+	"PublicContactLanguageCorrespondence": "PublicContactLanguageCorresp",
+	"DirectDischargesReleasestoWater": "DirectDischargeReleasestoWater",
+	"UndergroundInjectionDisposedOnSite": "UngrdInjectionDisposedOnSite",
+	"UndergroundInjectionDisposedOffSite": "UngrdInjectionDisposedOffSite",
+	"PhysicalTreatmentOffSiteTransfers": "PhysicalTreatOffSiteTransf",
+	"ChemicalTreatmentOffSiteTransfers": "ChemicalTreatOffSiteTransf",
+	"BiologicalTreatmentOffSiteTransfers": "BiologicalTreatOffSiteTransf",
+	"IncinerationThermalOffSiteTransfers": "IncinerThermalOffSiteTransf",
+	"MunicipalSewageTreatmentPlantOffsiteTransfers": "MuniSewTreatPlantOffsiteTransf",
+	"TailingsManagementDisposedOnSite": "TailingsManageDisposedOnSite",
+	"WasteRockManagementDisposedOnSite": "WasteRockManageDisposedOnSite",
+	"TailingsManagementDisposedOffSite": "TailingsManageDisposedOffSite",
+	"WasteRockManagementDisposedOffSite": "WasteRockManageDisposedOffSite",
+	"RecoveryofSolventsRecycledOffSite": "RecovofSolventsRecycledOffSite",
+	"RecoveryofOrganicSubstancesRecycledOffSite": "RecovofOrgSubRecycledOffSite",
+	"RecoveryofMetalsandMetalCompoundsRecycledOffSite": "RecovofMetalsRecycledOffSite",
+	"RecoveryofInorganicMaterialsRecycledOffSite": "RecovofInorganRecycledOffSite",
+	"RecoveryofAcidsandBasesRecycledOffSite": "RecovofAcidsRecycledOffSite",
+	"RecoveryofCatalystsRecycledOffSite": "RecovofCatalystRecycledOffSite",
+	"RecoveryofPollutionAbatementResiduesRecycledOffSite": "RecovofPolAbaReRecycledOffSite",
+	"RefiningofReuseofUsedOilRecycledOffSite": "RefofReuseOilRecycledOffSite",
+	"UseEnteredtheFacilityAnnualPercentageChange": "UseEnteredtheFacAnnPctChange",
+	"UseReportingPeriodofLastReportedQuantity": "UseRptPeriodofLastReportedQnt",
+	"CreatedReportingPeriodofLastReportedQuantity": "CreatedRptPrdofLastRptQnt",
+	"ContainedinProductAnnualPercentageChange": "ConinProdAnnPctChange",
+	"ContainedinProductReportingPeriodofLastReportedQuantity": "ConinProdRptPrddofLastRptQnt",
+	"ReasonsforChangeTRAQuantifications": "ReasonsforChangeTRAQnt",
+	"AllMediaReportingPeriodofLastReportedQuantity": "AllMediaRptPeriodofLastRptQnt",
+	"ReleasestoAirAnnualPercentageChange": "ReleaseAirAnnPctChange",
+	"ReleasestoAirReportingPeriodofLastReportedQuantity": "ReleaseAirRptPrdofLasRptQnt",
+	"ReleasestoWaterAnnualPercentageChange": "ReleaseWaterAnnPctChange",
+	"ReleasestoWaterReportingPeriodofLastReportedQuantity": "ReleaseWaterRptPrdofLasRptQnt",
+	"ReleasestoLandAnnualPercentageChange": "ReleaseLandAnnPctChange",
+	"ReleasestoLandReportingPeriodofLastReportedQuantity": "ReleaseLandRptPrdofLasRptQnt",
+	"DisposedOnSiteAnnualPercentageChange": "DispOnSiteAnnPctChange",
+	"DisposedOnSiteReportingPeriodofLastReportedQuantity": "DispOnSiteRptPrdofLasRptQnt",
+	"DisposedOffSiteAnnualPercentageChange": "DispOffSiteAnnPctChange",
+	"DisposedOffSiteReportingPeriodofLastReportedQuantity": "DispOffSiteRptPrdofLasRptQnt",
+	"OffSiteTransfersAnnualPercentageChange": "OffSiteTransfAnnPctChange",
+	"OffSiteTransfersReportingPeriodofLastReportedQuantity": "OffSiteTransfRptPrdofLasRptQnt",
+	"RecycledOffSiteAnnualPercentageChange": "RecycledOffSiteAnnPctChange",
+	"RecycledReportingPeriodofLastReportedQuantity": "RecycledRptPrdofLasRptQnt",
+	"CreationReductionTargetQuantity": "CreationReductionTargetQnt",
+	"CreationReductionTargetTimeline": "CreationReductionTargetTimelin",
+	"NoOptionsIdentifiedforUseorCreation": "NoOptionsIdentifiedforUseorCre",
+	"Descriptionofreductionstepstaken": "Descofreductionstepstaken",
+	"OptionsImplementedAmountofreductioninuse": "OptImpAmtofReduinUse",
+	"OptionsImplementedAmountofreductionincreation": "OptImpAmtofReduinCreation",
+	"OptionsImplementedAmountofreductionincontainedinproduct": "OptImpAmtofReduinConinProduct",
+	"OptionsImplementedAmountofreductioninreleasetoair": "OptImpAmtofReduinReleasetoAir",
+	"OptionsImplementedAmountofreductioninreleasetowater": "OptImpAmtofReduinReleasetoWate",
+	"OptionsImplementedAmountofreductioninreleasetoland": "OptImpAmtofReduinReleasetoLand",
+	"OptionsImplementedAmountofreductionindisposedonsite": "OptImpAmtofReduinDisponSite",
+	"OptionsImplementedAmountofreductioninthesubstancedisposedoffsite": "OptImpAmtofReduinDispoffsite",
+	"OptionsImplementedAmountofreductioninrecycled": "OptImpAmtofReduinRecycled",
+	"AdditionalActionsAmountofreductioninuse": "AddActAmtofReduinUse",
+	"AdditionalActionsAmountofreductionincreation": "AddActAmtofReduinCreation",
+	"AdditionalActionsAmountofreductionincontainedinproduct": "AddActAmtofReduinConinProduct",
+	"AdditionalActionsAmountofreductioninreleasetoair": "AddActAmtofReduinReleasetoAir",
+	"AdditionalActionsAmountofreductioninreleasetowater": "AddActAmtofReduinReleasetoWate",
+	"AdditionalActionsAmountofreductioninreleasetoland": "AddActAmtofReduinReleasetoLand",
+	"AdditionalActionsAmountofreductionindisposedonsite": "AddActAmtofReduinDisponSite",
+	"AdditionalActionsAmountofreductioninthesubstancedisposedoffsite": "AddActAmtofReduinDispoffSite",
+	"AdditionalActionsAmountofreductioninrecycled": "AddActAmtofReduinRecycled",
+	"DisposedOnSiteAnnualPercentageChangeHTMLOnly": "DispOnSiteAnnPctChangeHTML",
+	"DisposedOffSiteAnnualPercentageChangeHTMLOnly": "DispOffSiteAnnPctChangeHTML"
+}
+featureFieldList = map(lambda x: [nameChangeFieldsDict[x[0]], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8]] if (x[0] in nameChangeFieldsDict) else x, featureFieldList)
+featureInsertCursorFields = tuple(map(lambda x: nameChangeFieldsDict[x] if (x in nameChangeFieldsDict) else x , list(featureInsertCursorFields)))
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 substanceList = list(set(substanceList))
@@ -188,9 +259,44 @@ for rownum in range(1, sh.nrows):
 	else:
 		planSummaryDict[row[0]] = 1
 	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41], row[42], row[43], row[44], row[45], row[46], row[47], row[48], row[49], row[50], row[51], row[52], row[53], row[54], row[55], row[56], row[57], row[58], row[59], row[60], row[61], row[62], row[63], row[64]]
-	featureData.append(rowValue)	
+	featureData.append(rowValue)
+
+nameChangeFieldsDict = {
+	"MunicipalityCityPhysicalAddress": "MunicipalityCityPhysicalAddres",
+	"StatementofIntenttoReduceUseText": "StatementofIntenttoReduceUse",
+	"ReasonforNoIntenttoReduceUseText": "ReasonforNoIntenttoReduceUse",
+	"StatementofIntenttoReduceCreationText": "StatementofIntenttoReduceCreat",
+	"ReasonforNoIntenttoReduceCreationText": "ReasonforNoIntenttoReduceCreat",
+	"UseReductionQuantityTargetValue": "UseReductionQuantityTargetValu",
+	"UseReductionQuantityTargetUnit": "UseReductionQuantityTargetUnit",
+	"UseReductionTimelineTargetYears": "UseReductionTimelineTargetYear",
+	"CreationReductionQuantityTargetValue": "CreReductionQuantityTargetValu",
+	"CreationReductionQuantityTargetUnit": "CreReductionQuantityTargetUnit",
+	"CreationReductionTimelineTargetYears": "CreReductionTimelineTargetYear",
+	"CreationReductionTargetDescription": "CreReductionTargetDescription",
+	"EstimatedUseReductionPercent": "EstUseReduPct",
+	"EstimatedCreationReductionPercent": "EstCreReduPct",
+	"EstimatedContainedinProductReductionPercent": "EstContainedinProductReduPct",
+	"EstimatedAirReleasesReduction": "EstAirReleasesRedu",
+	"EstimatedAirReleasesReductionPercent": "EstAirReleasesReduPct",
+	"EstimatedWaterReleasesReduction": "EstWaterReleasesRedu",
+	"EstimatedWaterReleasesReductionPercent": "EstWaterReleasesReduPct",
+	"EstimatedLandReleasesReduction": "EstLandReleasesRedu",
+	"EstimatedLandReleasesReductionPercent": "EstLandReleasesReduPct",
+	"EstimatedOnsiteDisposalsReduction": "EstOnsiteDisposalsRedu",
+	"EstimatedOnsiteDisposalsReductionPercent": "EstOnsiteDisposalsReduPct",
+	"EstimatedOffsiteDisposalsReduction": "EstOffsiteDisposalsRedu",
+	"EstimatedOffsiteDisposalsReductionPercent": "EstOffsiteDisposalsReduPct",
+	"EstimatedOffsiteRecyclingReduction": "EstOffsiteRecyclingRedu",
+	"EstimatedOffsiteRecyclingReductionPercent": "EstOffsiteRecyclingReduPct",
+	"AnticipatedTimelinesforAchievingReductionsinUse": "AntiTimelinesforAchieReduinUse",
+	"AnticipatedTimelinesforAchievingReductionsinCreation": "AntiTimelinesforAchieReduinCre",
+	"DescriptionofAnyAdditionalActionsTaken": "DescofAnyAdditActionsTaken"
+}
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingPeriod", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["IntenttoReduceUseYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementofIntenttoReduceUseText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonforNoIntenttoReduceUseText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["IntenttoReduceCreationYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementofIntenttoReduceCreationText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonforNoIntenttoReduceCreationText", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["PlanObjectives", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionQuantityTargetValue", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionQuantityTargetUnit", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionTimelineTargetYears", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UseReductionTargetDescription", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionQuantityTargetValue", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionQuantityTargetUnit", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionTimelineTargetYears", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["CreationReductionTargetDescription", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforUse", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforUseSummary", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforCreation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsforCreationSummary", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["StatementNoOptionImplementedYN", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReasonsNoOptionImplemented", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["OptionReductionCategory", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ActivityTaken", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofOption", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedUseReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedCreationReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedContainedinProductReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedAirReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedAirReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedWaterReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedWaterReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedLandReleasesReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedLandReleasesReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOnsiteDisposalsReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOnsiteDisposalsReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteDisposalsReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteDisposalsReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteRecyclingReduction", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["EstimatedOffsiteRecyclingReductionPercent", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["AnticipatedTimelinesforAchievingReductionsinUse", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["AnticipatedTimelinesforAchievingReductionsinCreation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["RationaleWhyOptionImplemented", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofAnyAdditionalActionsTaken", "TEXT", "", "", "10000", "", "NULLABLE", "NON_REQUIRED", ""], ["VersionofthePlan", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureFieldList = map(lambda x: [nameChangeFieldsDict[x[0]], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8]] if (x[0] in nameChangeFieldsDict) else x, featureFieldList)
 featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingPeriod", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "IntenttoReduceUseYN", "StatementofIntenttoReduceUseText", "ReasonforNoIntenttoReduceUseText", "IntenttoReduceCreationYN", "StatementofIntenttoReduceCreationText", "ReasonforNoIntenttoReduceCreationText", "PlanObjectives", "UseReductionQuantityTargetValue", "UseReductionQuantityTargetUnit", "UseReductionTimelineTargetYears", "UseReductionTargetDescription", "CreationReductionQuantityTargetValue", "CreationReductionQuantityTargetUnit", "CreationReductionTimelineTargetYears", "CreationReductionTargetDescription", "ReasonsforUse", "ReasonsforUseSummary", "ReasonsforCreation", "ReasonsforCreationSummary", "StatementNoOptionImplementedYN", "ReasonsNoOptionImplemented", "OptionReductionCategory", "ActivityTaken", "DescriptionofOption", "EstimatedUseReductionPercent", "EstimatedCreationReductionPercent", "EstimatedContainedinProductReductionPercent", "EstimatedAirReleasesReduction", "EstimatedAirReleasesReductionPercent", "EstimatedWaterReleasesReduction", "EstimatedWaterReleasesReductionPercent", "EstimatedLandReleasesReduction", "EstimatedLandReleasesReductionPercent", "EstimatedOnsiteDisposalsReduction", "EstimatedOnsiteDisposalsReductionPercent", "EstimatedOffsiteDisposalsReduction", "EstimatedOffsiteDisposalsReductionPercent", "EstimatedOffsiteRecyclingReduction", "EstimatedOffsiteRecyclingReductionPercent", "AnticipatedTimelinesforAchievingReductionsinUse", "AnticipatedTimelinesforAchievingReductionsinCreation", "RationaleWhyOptionImplemented", "DescriptionofAnyAdditionalActionsTaken", "VersionofthePlan")
+featureInsertCursorFields = tuple(map(lambda x: nameChangeFieldsDict[x] if (x in nameChangeFieldsDict) else x , list(featureInsertCursorFields)))
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 featureName = "ExitRecords"
@@ -216,8 +322,13 @@ for ExitRecordsXLS in ExitRecordsXLSList:
 		row[21] = str(year) + "/" + monthStr + "/" + dayStr
 		rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23]]
 		featureData.append(rowValue)
+nameChangeFieldsDict = {
+	"MunicipalityCityPhysicalAddress": "MunicipalityCityPhysicalAddres"
+}
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingYear", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DateofSubmission", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Reason", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofCircumstances", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureFieldList = map(lambda x: [nameChangeFieldsDict[x[0]], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8]] if (x[0] in nameChangeFieldsDict) else x, featureFieldList)
 featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingYear", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "DateofSubmission", "Reason", "DescriptionofCircumstances")
+featureInsertCursorFields = tuple(map(lambda x: nameChangeFieldsDict[x] if (x in nameChangeFieldsDict) else x , list(featureInsertCursorFields)))
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 featureName = "ExemptionRecords"
@@ -243,8 +354,13 @@ for rownum in range(1, sh.nrows):
 	row[21] = str(year) + "/" + monthStr + "/" + dayStr
 	rowValue = [(0, 0), row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24]]
 	featureData.append(rowValue)
+nameChangeFieldsDict = {
+	"MunicipalityCityPhysicalAddress": "MunicipalityCityPhysicalAddres"
+}
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRIID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ReportingPeriod", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["OrganizationName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["FacilityName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NumberofEmployees", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddressPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MunicipalityCityPhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ProvincePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCodePhysicalAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactFullName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactPosition", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactTelephone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PublicContactEMail", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["HighestRankingEmployee", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceName", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SubstanceCAS", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DateofSubmission", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["ApplicableArea", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["DescriptionofCircumstances", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["RecordRank", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
+featureFieldList = map(lambda x: [nameChangeFieldsDict[x[0]], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8]] if (x[0] in nameChangeFieldsDict) else x, featureFieldList)
 featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "ReportingPeriod", "OrganizationName", "FacilityName", "NAICS", "NumberofEmployees", "StreetAddressPhysicalAddress", "MunicipalityCityPhysicalAddress", "ProvincePhysicalAddress", "PostalCodePhysicalAddress", "UTMZone", "UTMEasting", "UTMNorthing", "PublicContactFullName", "PublicContactPosition", "PublicContactTelephone", "PublicContactEMail", "HighestRankingEmployee", "SubstanceName", "SubstanceCAS", "DateofSubmission", "ApplicableArea", "DescriptionofCircumstances", "RecordRank")
+featureInsertCursorFields = tuple(map(lambda x: nameChangeFieldsDict[x] if (x in nameChangeFieldsDict) else x , list(featureInsertCursorFields)))
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
 
