@@ -44,7 +44,7 @@ def createFeatureClass(featureName, featureData, featureFieldList, featureInsert
 	arcpy.Delete_management(featureNameNAD83Path, "FeatureClass")
 	print "Finish " + featureName + " feature class."
 
-featureName = "sectorNames"
+featureName = "TRAIS_SectorNames"
 featureData = []
 for line in fileinput.input('input\\sectorNames.txt'):
 	items = line.strip().split("\t")
@@ -56,7 +56,7 @@ featureFieldList = [["ID", "LONG", "", "", "", "", "NON_NULLABLE", "REQUIRED", "
 featureInsertCursorFields = ("SHAPE@XY", "ID", "sectorNameEn", "sectorNameFr")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
-featureName = "NAICS"
+featureName = "TRAIS_NAICS"
 featureData = []
 NAICSDict = {}
 for line in fileinput.input('input\\NAICS.txt'):
@@ -87,7 +87,7 @@ def calculateTotal(row, annualReportFieldIndexDict, fields):
 		total = total + parseNumber(row[annualReportFieldIndexDict[field]])
 	return str(total)
 
-featureName = "AnnualReport"
+featureName = "TRAIS_AnnualReport"
 annualReportFieldIndexDict = {}
 featureFieldList = [["UniqueFacilityID", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""]]
 annualReportFieldIndexDict[0] = "UniqueFacilityID"
@@ -215,7 +215,7 @@ for line in fileinput.input('input\\substance_codes.txt'):
 	items = line.strip().split("\t")
 	substancesLanguageDict[(items[1])[1:-1]] = (items[2])[1:-1]
 
-featureName = "SubstanceCodes"
+featureName = "TRAIS_SubstanceCodes"
 featureData = []
 substancesCodeDict = {}
 cntr = 1
@@ -244,7 +244,7 @@ featureFieldList = [["CODE", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED",
 featureInsertCursorFields = ("SHAPE@XY", "CODE", "SUBSTANCE_EN", "SUBSTANCE_FR", "CASNumber")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
-featureName = "PlanSummary"
+featureName = "TRAIS_PlanSummary"
 featureData = []
 #wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Final.xls')
 #wb = xlrd.open_workbook('input\\Data\\TRA - Plan Summary - 2011 - 20130815 - Amended (SAMPLE ONLY).xls')
@@ -299,7 +299,7 @@ featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "Reportin
 featureInsertCursorFields = tuple(map(lambda x: nameChangeFieldsDict[x] if (x in nameChangeFieldsDict) else x , list(featureInsertCursorFields)))
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
-featureName = "ExitRecords"
+featureName = "TRAIS_ExitRecords"
 featureData = []
 exitRecordDict = {}
 for ExitRecordsXLS in ExitRecordsXLSList:
@@ -331,7 +331,7 @@ featureInsertCursorFields = ("SHAPE@XY", "UniqueFacilityID", "NPRIID", "Reportin
 featureInsertCursorFields = tuple(map(lambda x: nameChangeFieldsDict[x] if (x in nameChangeFieldsDict) else x , list(featureInsertCursorFields)))
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
 
-featureName = "ExemptionRecords"
+featureName = "TRAIS_ExemptionRecords"
 featureData = []
 #wb = xlrd.open_workbook('input\\Data\\TRA - Exemption Records - 2012 - 20130815 - V2 (SAMPLE ONLY).xls')
 wb = xlrd.open_workbook('input\\Data\\' + ExemptionRecordsXLS)
@@ -381,7 +381,7 @@ for AnnualReportXLS in AnnualReportXLSList:
 		else:
 			substanceListDict[UniqueFacilityID] = [code]
 
-featureName = "Facilities"
+featureName = "TRAIS_Facility_Locations"
 featureData = []
 
 #wb = xlrd.open_workbook('input\\Data\\TRA - Facility Table - 2010 and 2011 (M) - 20130815 - Final.xls')
@@ -442,6 +442,40 @@ for rownum in range(1, sh.nrows):
 featureFieldList = [["UniqueID", "TEXT", "", "", "", "", "NON_NULLABLE", "REQUIRED", ""], ["NPRIId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["MOEId", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Organisation", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Facility", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NAICS", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Year", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["StreetAddress", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["City", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["PostalCode", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMZone", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMEasting", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["UTMNorthing", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Latitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Longitude", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceDataset", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SourceXMLID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NPRI_ID", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Sector", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["SectorDesc", "TEXT", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMsubst", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["Substance_List", "TEXT", "", "", "2000", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMPlanSummary", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""], ["NUMRecord", "LONG", "", "", "", "", "NULLABLE", "NON_REQUIRED", ""]]
 featureInsertCursorFields = ("SHAPE@XY", "UniqueID", "NPRIId", "MOEId", "Organisation", "Facility", "NAICS", "Year", "StreetAddress", "City", "PostalCode", "UTMZone", "UTMEasting", "UTMNorthing", "Latitude", "Longitude", "SourceDataset", "SourceXMLID", "NPRI_ID", "Sector", "SectorDesc", "NUMsubst", "Substance_List", "NUMPlanSummary", "NUMRecord")
 createFeatureClass(featureName, featureData, featureFieldList, featureInsertCursorFields)
+
+# Prepare the msd, mxd, and readme.txt
+os.system("copy " + INPUT_PATH + "\\TRAIS.msd " + OUTPUT_PATH)
+os.system("copy " + INPUT_PATH + "\\TRAIS.mxd " + OUTPUT_PATH)
+f = open (INPUT_PATH + "\\readme_TRAIS.txt","r")
+data = f.read()
+f.close()
+import time
+dateString = time.strftime("%Y/%m/%d", time.localtime())
+data = data.replace("[DATE]", dateString)
+f = open (OUTPUT_PATH + "\\readme_TRAIS.txt","w")
+f.write(data)
+f.close()
+
+# Compress the msd, mxd, readme.txt and file geodatabase together into a zip file named TRAIS.zip, which will be send to web service publisher. 
+
+target_dir = OUTPUT_PATH + '\\TRAIS.gdb'
+zip = zipfile.ZipFile(OUTPUT_PATH + '\\TRAIS.zip', 'w', zipfile.ZIP_DEFLATED)
+rootlen = len(target_dir) + 1
+for base, dirs, files in os.walk(target_dir):
+   for file in files:
+      fn = os.path.join(base, file)
+      zip.write(fn, "TRAIS.gdb\\" + fn[rootlen:])
+zip.write(OUTPUT_PATH + '\\TRAIS.msd', "TRAIS.msd")
+zip.write(OUTPUT_PATH + '\\TRAIS.mxd', "TRAIS.mxd")
+zip.write(OUTPUT_PATH + '\\readme_TRAIS.txt', "readme_TRAIS.txt")
+zip.close()
+
+# Remove the msd, mxd, readme.txt and file geodatabase. 
+os.system("del " + OUTPUT_PATH + "\\TRAIS.msd")
+os.system("del " + OUTPUT_PATH + "\\TRAIS.mxd")
+os.system("del " + OUTPUT_PATH + "\\readme_TRAIS.txt")
+os.system("rmdir " + OUTPUT_PATH + "\\TRAIS.gdb /s /q")
+
 
 elapsed_time = time.time() - start_time
 print elapsed_time
